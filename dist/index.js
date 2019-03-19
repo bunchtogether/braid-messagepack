@@ -34,6 +34,44 @@ function decodeCredentialsResponse(buffer        ) {
   return new CredentialsResponse(value);
 }
 
+class PeerSync {
+  constructor(id       , data         , peers         , providers             , activeProviders                    , peerSubscriptions                      ) {
+    this.id = id;
+    this.data = data;
+    this.peers = peers;
+    this.providers = providers;
+    this.activeProviders = activeProviders;
+    this.peerSubscriptions = peerSubscriptions;
+  }
+             
+                 
+                  
+                          
+                                      
+                                          
+}
+
+function decodePeerSync(buffer        ) {
+  const decoded = msgpack.decode(buffer);
+  return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5]);
+}
+
+function encodePeerSync(peerSync          ) {
+  return msgpack.encode([peerSync.id, peerSync.data, peerSync.peers, peerSync.providers, peerSync.activeProviders, peerSync.peerSubscriptions]);
+}
+
+class PeerSyncResponse {
+  constructor(value       ) {
+    this.value = value;
+  }
+                
+}
+
+function decodePeerSyncResponse(buffer        ) {
+  const value = msgpack.decode(buffer);
+  return new PeerSyncResponse(value);
+}
+
 class DataDump {
   constructor(queue                     , ids                = []) {
     this.queue = queue;
@@ -198,6 +236,8 @@ msgpack.register(0x4, ProviderDump, encodeProviderDump, decodeProviderDump);
 msgpack.register(0x5, ActiveProviderDump, encodeActiveProviderDump, decodeActiveProviderDump);
 msgpack.register(0x6, PeerDump, encodePeerDump, decodePeerDump);
 msgpack.register(0x7, PeerSubscriptionDump, encodePeerSubscriptionDump, decodePeerSubscriptionDump);
+msgpack.register(0x8, PeerSync, encodePeerSync, decodePeerSync);
+msgpack.register(0x9, PeerSyncResponse, encode, decodePeerSyncResponse);
 
 msgpack.register(0x10, PeerRequest, encode, decodePeerRequest);
 msgpack.register(0x11, PeerResponse, encode, decodePeerResponse);
@@ -213,6 +253,8 @@ module.exports.ProviderDump = ProviderDump;
 module.exports.ActiveProviderDump = ActiveProviderDump;
 module.exports.PeerDump = PeerDump;
 module.exports.PeerSubscriptionDump = PeerSubscriptionDump;
+module.exports.PeerSync = PeerSync;
+module.exports.PeerSyncResponse = PeerSyncResponse;
 module.exports.Credentials = Credentials;
 module.exports.CredentialsResponse = CredentialsResponse;
 module.exports.SubscribeRequest = SubscribeRequest;

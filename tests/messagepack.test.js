@@ -17,6 +17,8 @@ const {
   ActiveProviderDump,
   PeerDump,
   PeerSubscriptionDump,
+  PeerSync,
+  PeerSyncResponse,
   encode,
   decode,
 } = require('../src');
@@ -116,45 +118,54 @@ describe('Messagepack', () => {
     expect(ids).toEqual(decoded.ids);
   });
   test('Should encode and decode provider dumps', async () => {
-    const alice = new ObservedRemoveSet();
-    const bob = new ObservedRemoveSet();
+    const alice = new ObservedRemoveMap();
+    const bob = new ObservedRemoveMap();
     const key = uuid.v4();
-    alice.add(key);
+    const value = {
+      [uuid.v4()]: uuid.v4(),
+    };
+    alice.set(key, value);
     const ids = [randomInteger()];
     const providerDump = new ProviderDump(alice.dump(), ids);
     const encoded = encode(providerDump);
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(ProviderDump);
     bob.process(decoded.queue);
-    expect(bob.has(key)).toEqual(true);
+    expect(bob.get(key)).toEqual(value);
     expect(ids).toEqual(decoded.ids);
   });
-  test('Should encode and decode listener dumps', async () => {
-    const alice = new ObservedRemoveSet();
-    const bob = new ObservedRemoveSet();
+  test('Should encode and decode active provider dumps', async () => {
+    const alice = new ObservedRemoveMap();
+    const bob = new ObservedRemoveMap();
     const key = uuid.v4();
-    alice.add(key);
+    const value = {
+      [uuid.v4()]: uuid.v4(),
+    };
+    alice.set(key, value);
     const ids = [randomInteger()];
-    const listenerDump = new ActiveProviderDump(alice.dump(), ids);
-    const encoded = encode(listenerDump);
+    const activeProviderDump = new ActiveProviderDump(alice.dump(), ids);
+    const encoded = encode(activeProviderDump);
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(ActiveProviderDump);
     bob.process(decoded.queue);
-    expect(bob.has(key)).toEqual(true);
+    expect(bob.get(key)).toEqual(value);
     expect(ids).toEqual(decoded.ids);
   });
   test('Should encode and decode peer dumps', async () => {
-    const alice = new ObservedRemoveSet();
-    const bob = new ObservedRemoveSet();
+    const alice = new ObservedRemoveMap();
+    const bob = new ObservedRemoveMap();
     const key = uuid.v4();
-    alice.add(key);
+    const value = {
+      [uuid.v4()]: uuid.v4(),
+    };
+    alice.set(key, value);
     const ids = [randomInteger()];
     const peerDump = new PeerDump(alice.dump(), ids);
     const encoded = encode(peerDump);
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(PeerDump);
     bob.process(decoded.queue);
-    expect(bob.has(key)).toEqual(true);
+    expect(bob.get(key)).toEqual(value);
     expect(ids).toEqual(decoded.ids);
   });
   test('Should encode and decode subscriber dumps', async () => {
@@ -163,12 +174,38 @@ describe('Messagepack', () => {
     const key = uuid.v4();
     alice.add(key);
     const ids = [randomInteger()];
-    const peerDump = new PeerSubscriptionDump(alice.dump(), ids);
-    const encoded = encode(peerDump);
+    const peerSubscriptionDump = new PeerSubscriptionDump(alice.dump(), ids);
+    const encoded = encode(peerSubscriptionDump);
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(PeerSubscriptionDump);
     bob.process(decoded.queue);
     expect(bob.has(key)).toEqual(true);
     expect(ids).toEqual(decoded.ids);
+  });
+  test('Should encode and decode peer syncs', async () => {
+    const id = uuid.v4();
+    const dataDump = new DataDump([[], []], []);
+    const peerDump = new PeerDump([[], []], []);
+    const providerDump = new ProviderDump([[], []], []);
+    const activeProviderDump = new ActiveProviderDump([[], []], []);
+    const peerSubscriptionDump = new PeerSubscriptionDump([[], []], []);
+    const peerSync = new PeerSync(id, dataDump, peerDump, providerDump, activeProviderDump, peerSubscriptionDump);
+    const encoded = encode(peerSync);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(PeerSync);
+    expect(decoded.id).toEqual(id);
+    expect(decoded.data).toBeInstanceOf(DataDump);
+    expect(decoded.peers).toBeInstanceOf(PeerDump);
+    expect(decoded.providers).toBeInstanceOf(ProviderDump);
+    expect(decoded.activeProviders).toBeInstanceOf(ActiveProviderDump);
+    expect(decoded.peerSubscriptions).toBeInstanceOf(PeerSubscriptionDump);
+  });
+  test('Should encode and decode peer sync responses', async () => {
+    const id = uuid.v4();
+    const peerSyncResponse = new PeerSyncResponse(id);
+    const encoded = encode(peerSyncResponse);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(PeerSyncResponse);
+    expect(id).toEqual(decoded.value);
   });
 });
