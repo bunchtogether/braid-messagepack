@@ -35,7 +35,7 @@ function decodeCredentialsResponse(buffer: Buffer) {
 }
 
 class PeerSync {
-  constructor(id:string, data:DataDump, peers:PeerDump, providers:ProviderDump, activeProviders: ActiveProviderDump, peerSubscriptions: PeerSubscriptionDump) {
+  constructor(id:number, data:DataDump, peers:PeerDump, providers:ProviderDump, activeProviders: ActiveProviderDump, peerSubscriptions: PeerSubscriptionDump) {
     this.id = id;
     this.data = data;
     this.peers = peers;
@@ -43,7 +43,7 @@ class PeerSync {
     this.activeProviders = activeProviders;
     this.peerSubscriptions = peerSubscriptions;
   }
-  id: string;
+  id: number;
   data: DataDump;
   peers: PeerDump;
   providers: ProviderDump;
@@ -61,10 +61,10 @@ function encodePeerSync(peerSync: PeerSync) {
 }
 
 class PeerSyncResponse {
-  constructor(value:string) {
+  constructor(value:number) {
     this.value = value;
   }
-  value: string;
+  value: number;
 }
 
 function decodePeerSyncResponse(buffer: Buffer) {

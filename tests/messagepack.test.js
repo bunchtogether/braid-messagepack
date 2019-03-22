@@ -49,7 +49,7 @@ describe('Messagepack', () => {
     expect({ success, code, message }).toEqual(decoded.value);
   });
   test('Should encode and decode peer requests', async () => {
-    const peerId = uuid.v4();
+    const peerId = randomInteger();
     const peerRequest = new PeerRequest(peerId);
     const encoded = encode(peerRequest);
     const decoded = decode(encoded);
@@ -57,7 +57,7 @@ describe('Messagepack', () => {
     expect(peerId).toEqual(decoded.value);
   });
   test('Should encode and decode peer responses', async () => {
-    const id = uuid.v4();
+    const id = randomInteger();
     const success = Math.random() > 0.5;
     const code = Math.floor(Math.random() * 1000);
     const message = uuid.v4();
@@ -183,7 +183,7 @@ describe('Messagepack', () => {
     expect(ids).toEqual(decoded.ids);
   });
   test('Should encode and decode peer syncs', async () => {
-    const id = uuid.v4();
+    const id = randomInteger();
     const dataDump = new DataDump([[], []], []);
     const peerDump = new PeerDump([[], []], []);
     const providerDump = new ProviderDump([[], []], []);
@@ -201,7 +201,7 @@ describe('Messagepack', () => {
     expect(decoded.peerSubscriptions).toBeInstanceOf(PeerSubscriptionDump);
   });
   test('Should encode and decode peer sync responses', async () => {
-    const id = uuid.v4();
+    const id = randomInteger();
     const peerSyncResponse = new PeerSyncResponse(id);
     const encoded = encode(peerSyncResponse);
     const decoded = decode(encoded);
