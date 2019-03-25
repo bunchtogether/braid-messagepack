@@ -264,6 +264,26 @@ function decodeEventUnsubscribe(buffer: Buffer) {
   return new EventUnsubscribe(value);
 }
 
+class BraidEvent {
+  constructor(name: string, value:any, ids?:Array<number> = []) {
+    this.name = name;
+    this.value = value;
+    this.ids = ids;
+  }
+  name: string;
+  value: any;
+  ids:Array<number>;
+}
+
+function decodeBraidEvent(buffer: Buffer) {
+  const decoded = msgpack.decode(buffer);
+  return new BraidEvent(decoded[0], decoded[1], decoded[2]);
+}
+
+function encodeBraidEvent(event: BraidEvent) {
+  return msgpack.encode([event.name, event.value, event.ids]);
+}
+
 msgpack.register(0x1, Credentials, encode, decodeCredentials);
 msgpack.register(0x2, CredentialsResponse, encode, decodeCredentialsResponse);
 
@@ -286,6 +306,7 @@ msgpack.register(0x22, Unsubscribe, encode, decodeUnsubscribe);
 msgpack.register(0x23, EventSubscribeRequest, encode, decodeEventSubscribeRequest);
 msgpack.register(0x24, EventSubscribeResponse, encode, decodeEventSubscribeResponse);
 msgpack.register(0x25, EventUnsubscribe, encode, decodeEventUnsubscribe);
+msgpack.register(0x26, BraidEvent, encodeBraidEvent, decodeBraidEvent);
 
 module.exports.DataDump = DataDump;
 module.exports.ProviderDump = ProviderDump;
@@ -302,6 +323,7 @@ module.exports.Unsubscribe = Unsubscribe;
 module.exports.EventSubscribeRequest = EventSubscribeRequest;
 module.exports.EventSubscribeResponse = EventSubscribeResponse;
 module.exports.EventUnsubscribe = EventUnsubscribe;
+module.exports.BraidEvent = BraidEvent;
 module.exports.PeerRequest = PeerRequest;
 module.exports.PeerResponse = PeerResponse;
 module.exports.Unpeer = Unpeer;

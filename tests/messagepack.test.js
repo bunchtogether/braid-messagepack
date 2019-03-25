@@ -15,6 +15,7 @@ const {
   EventSubscribeRequest,
   EventSubscribeResponse,
   EventUnsubscribe,
+  BraidEvent,
   DataDump,
   ProviderDump,
   ActiveProviderDump,
@@ -129,6 +130,18 @@ describe('Messagepack', () => {
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(EventUnsubscribe);
     expect(name).toEqual(decoded.value);
+  });
+  test('Should encode and decode events', async () => {
+    const name = uuid.v4();
+    const value = uuid.v4();
+    const ids = [randomInteger()];
+    const braidEvent = new BraidEvent(name, value, ids);
+    const encoded = encode(braidEvent);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(BraidEvent);
+    expect(decoded.name).toEqual(name);
+    expect(decoded.value).toEqual(value);
+    expect(decoded.ids).toEqual(ids);
   });
   test('Should encode and decode data dumps', async () => {
     const alice = new ObservedRemoveMap();
