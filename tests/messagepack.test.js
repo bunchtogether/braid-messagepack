@@ -133,14 +133,14 @@ describe('Messagepack', () => {
   });
   test('Should encode and decode events', async () => {
     const name = uuid.v4();
-    const value = uuid.v4();
+    const args = [uuid.v4(), uuid.v4()];
     const ids = [randomInteger()];
-    const braidEvent = new BraidEvent(name, value, ids);
+    const braidEvent = new BraidEvent(name, args, ids);
     const encoded = encode(braidEvent);
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(BraidEvent);
     expect(decoded.name).toEqual(name);
-    expect(decoded.value).toEqual(value);
+    expect(decoded.args).toEqual(args);
     expect(decoded.ids).toEqual(ids);
     expect(decoded.id).toEqual(braidEvent.id);
   });

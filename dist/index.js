@@ -266,14 +266,14 @@ function decodeEventUnsubscribe(buffer        ) {
 }
 
 class BraidEvent {
-  constructor(name        , value    , ids                = [], id         = uuid.v4()) {
+  constructor(name        , args           , ids                = [], id         = uuid.v4()) {
     this.name = name;
-    this.value = value;
+    this.args = args;
     this.ids = ids;
     this.id = id;
   }
                
-             
+                   
                     
              
 }
@@ -284,7 +284,7 @@ function decodeBraidEvent(buffer        ) {
 }
 
 function encodeBraidEvent(event            ) {
-  return msgpack.encode([event.name, event.value, event.ids, event.id]);
+  return msgpack.encode([event.name, event.args, event.ids, event.id]);
 }
 
 msgpack.register(0x1, Credentials, encode, decodeCredentials);
