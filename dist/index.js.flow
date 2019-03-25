@@ -1,5 +1,6 @@
 // @flow
 
+const uuid = require('uuid');
 const msgpack = require('msgpack5')();
 
 function encode(o: {value: any}) {
@@ -265,23 +266,25 @@ function decodeEventUnsubscribe(buffer: Buffer) {
 }
 
 class BraidEvent {
-  constructor(name: string, value:any, ids?:Array<number> = []) {
+  constructor(name: string, value:any, ids?:Array<number> = [], id?:string = uuid.v4()) {
     this.name = name;
     this.value = value;
     this.ids = ids;
+    this.id = id;
   }
   name: string;
   value: any;
   ids:Array<number>;
+  id: string;
 }
 
 function decodeBraidEvent(buffer: Buffer) {
   const decoded = msgpack.decode(buffer);
-  return new BraidEvent(decoded[0], decoded[1], decoded[2]);
+  return new BraidEvent(decoded[0], decoded[1], decoded[2], decoded[3]);
 }
 
 function encodeBraidEvent(event: BraidEvent) {
-  return msgpack.encode([event.name, event.value, event.ids]);
+  return msgpack.encode([event.name, event.value, event.ids, event.id]);
 }
 
 msgpack.register(0x1, Credentials, encode, decodeCredentials);

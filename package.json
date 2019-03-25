@@ -1,6 +1,6 @@
 {
   "name": "@bunchtogether/braid-messagepack",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "dist/index.js",
   "repository": "https://github.com/bunchtogether/braid-messagepack.git",
   "author": "johnwehr@bunchtogether.com",
@@ -55,10 +55,10 @@
     "jest-diff": "^24.0.0",
     "jest-flow-transform": "^1.0.1",
     "observed-remove": "^2.2.0",
-    "pre-commit": "^1.2.2",
-    "uuid": "^3.3.2"
+    "pre-commit": "^1.2.2"
   },
   "dependencies": {
-    "msgpack5": "^4.2.1"
+    "msgpack5": "^4.2.1",
+    "uuid": "^3.3.2"
   }
 }

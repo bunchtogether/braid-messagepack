@@ -142,6 +142,7 @@ describe('Messagepack', () => {
     expect(decoded.name).toEqual(name);
     expect(decoded.value).toEqual(value);
     expect(decoded.ids).toEqual(ids);
+    expect(decoded.id).toEqual(braidEvent.id);
   });
   test('Should encode and decode data dumps', async () => {
     const alice = new ObservedRemoveMap();
