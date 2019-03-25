@@ -12,6 +12,9 @@ const {
   SubscribeRequest,
   SubscribeResponse,
   Unsubscribe,
+  EventSubscribeRequest,
+  EventSubscribeResponse,
+  EventUnsubscribe,
   DataDump,
   ProviderDump,
   ActiveProviderDump,
@@ -99,6 +102,33 @@ describe('Messagepack', () => {
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(Unsubscribe);
     expect(key).toEqual(decoded.value);
+  });
+  test('Should encode and decode event subscribe requests', async () => {
+    const name = uuid.v4();
+    const eventSubscribeRequest = new EventSubscribeRequest(name);
+    const encoded = encode(eventSubscribeRequest);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(EventSubscribeRequest);
+    expect(name).toEqual(decoded.value);
+  });
+  test('Should encode and decode event subscribe responses', async () => {
+    const name = uuid.v4();
+    const success = Math.random() > 0.5;
+    const code = Math.floor(Math.random() * 1000);
+    const message = uuid.v4();
+    const eventSubscribeResponse = new EventSubscribeResponse({ name, success, code, message });
+    const encoded = encode(eventSubscribeResponse);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(EventSubscribeResponse);
+    expect({ name, success, code, message }).toEqual(decoded.value);
+  });
+  test('Should encode and decode event unsubscribes', async () => {
+    const name = uuid.v4();
+    const eventUnsubscribe = new EventUnsubscribe(name);
+    const encoded = encode(eventUnsubscribe);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(EventUnsubscribe);
+    expect(name).toEqual(decoded.value);
   });
   test('Should encode and decode data dumps', async () => {
     const alice = new ObservedRemoveMap();

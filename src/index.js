@@ -228,6 +228,42 @@ function decodeUnsubscribe(buffer: Buffer) {
   return new Unsubscribe(value);
 }
 
+class EventSubscribeRequest {
+  constructor(value:string) {
+    this.value = value;
+  }
+  value: string;
+}
+
+function decodeEventSubscribeRequest(buffer: Buffer) {
+  const value = msgpack.decode(buffer);
+  return new EventSubscribeRequest(value);
+}
+
+class EventSubscribeResponse {
+  constructor(value:{name:string, success: boolean, code: number, message: string}) {
+    this.value = value;
+  }
+  value: {name:string, success: boolean, code: number, message: string};
+}
+
+function decodeEventSubscribeResponse(buffer: Buffer) {
+  const value = msgpack.decode(buffer);
+  return new EventSubscribeResponse(value);
+}
+
+class EventUnsubscribe {
+  constructor(value:string) {
+    this.value = value;
+  }
+  value: string;
+}
+
+function decodeEventUnsubscribe(buffer: Buffer) {
+  const value = msgpack.decode(buffer);
+  return new EventUnsubscribe(value);
+}
+
 msgpack.register(0x1, Credentials, encode, decodeCredentials);
 msgpack.register(0x2, CredentialsResponse, encode, decodeCredentialsResponse);
 
@@ -236,6 +272,7 @@ msgpack.register(0x4, ProviderDump, encodeProviderDump, decodeProviderDump);
 msgpack.register(0x5, ActiveProviderDump, encodeActiveProviderDump, decodeActiveProviderDump);
 msgpack.register(0x6, PeerDump, encodePeerDump, decodePeerDump);
 msgpack.register(0x7, PeerSubscriptionDump, encodePeerSubscriptionDump, decodePeerSubscriptionDump);
+
 msgpack.register(0x8, PeerSync, encodePeerSync, decodePeerSync);
 msgpack.register(0x9, PeerSyncResponse, encode, decodePeerSyncResponse);
 
@@ -246,7 +283,9 @@ msgpack.register(0x12, Unpeer, encodeEmpty, decodeUnpeer);
 msgpack.register(0x20, SubscribeRequest, encode, decodeSubscribeRequest);
 msgpack.register(0x21, SubscribeResponse, encode, decodeSubscribeResponse);
 msgpack.register(0x22, Unsubscribe, encode, decodeUnsubscribe);
-
+msgpack.register(0x23, EventSubscribeRequest, encode, decodeEventSubscribeRequest);
+msgpack.register(0x24, EventSubscribeResponse, encode, decodeEventSubscribeResponse);
+msgpack.register(0x25, EventUnsubscribe, encode, decodeEventUnsubscribe);
 
 module.exports.DataDump = DataDump;
 module.exports.ProviderDump = ProviderDump;
@@ -260,6 +299,9 @@ module.exports.CredentialsResponse = CredentialsResponse;
 module.exports.SubscribeRequest = SubscribeRequest;
 module.exports.SubscribeResponse = SubscribeResponse;
 module.exports.Unsubscribe = Unsubscribe;
+module.exports.EventSubscribeRequest = EventSubscribeRequest;
+module.exports.EventSubscribeResponse = EventSubscribeResponse;
+module.exports.EventUnsubscribe = EventUnsubscribe;
 module.exports.PeerRequest = PeerRequest;
 module.exports.PeerResponse = PeerResponse;
 module.exports.Unpeer = Unpeer;
