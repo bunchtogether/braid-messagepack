@@ -1,6 +1,6 @@
 {
   "name": "@bunchtogether/braid-messagepack",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "main": "dist/index.js",
   "repository": "https://github.com/bunchtogether/braid-messagepack.git",
   "author": "johnwehr@bunchtogether.com",
