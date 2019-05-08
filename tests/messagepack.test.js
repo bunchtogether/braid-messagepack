@@ -23,7 +23,6 @@ const {
   PeerSubscriptionDump,
   PeerSync,
   PeerSyncResponse,
-  DeleteUndefined,
   encode,
   decode,
 } = require('../src');
@@ -253,13 +252,5 @@ describe('Messagepack', () => {
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(PeerSyncResponse);
     expect(id).toEqual(decoded.value);
-  });
-  test('Should encode and decode delete undefined messages', async () => {
-    const key = uuid.v4();
-    const deleteUndefined = new DeleteUndefined(key);
-    const encoded = encode(deleteUndefined);
-    const decoded = decode(encoded);
-    expect(decoded).toBeInstanceOf(DeleteUndefined);
-    expect(key).toEqual(decoded.value);
   });
 });

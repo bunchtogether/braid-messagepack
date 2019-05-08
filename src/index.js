@@ -286,18 +286,6 @@ function encodeBraidEvent(event: BraidEvent) {
   return msgpack.encode([event.name, event.args, event.id, event.ids]);
 }
 
-class DeleteUndefined {
-  constructor(value:string) {
-    this.value = value;
-  }
-  value: string;
-}
-
-function decodeDeleteUndefined(buffer: Buffer) {
-  const value = msgpack.decode(buffer);
-  return new DeleteUndefined(value);
-}
-
 msgpack.register(0x1, Credentials, encode, decodeCredentials);
 msgpack.register(0x2, CredentialsResponse, encode, decodeCredentialsResponse);
 
@@ -321,7 +309,6 @@ msgpack.register(0x23, EventSubscribeRequest, encode, decodeEventSubscribeReques
 msgpack.register(0x24, EventSubscribeResponse, encode, decodeEventSubscribeResponse);
 msgpack.register(0x25, EventUnsubscribe, encode, decodeEventUnsubscribe);
 msgpack.register(0x26, BraidEvent, encodeBraidEvent, decodeBraidEvent);
-msgpack.register(0x27, DeleteUndefined, encode, decodeDeleteUndefined);
 
 module.exports.DataDump = DataDump;
 module.exports.ProviderDump = ProviderDump;
@@ -341,7 +328,6 @@ module.exports.EventUnsubscribe = EventUnsubscribe;
 module.exports.BraidEvent = BraidEvent;
 module.exports.PeerRequest = PeerRequest;
 module.exports.PeerResponse = PeerResponse;
-module.exports.DeleteUndefined = DeleteUndefined;
 module.exports.Unpeer = Unpeer;
 module.exports.encode = msgpack.encode;
 module.exports.decode = msgpack.decode;
