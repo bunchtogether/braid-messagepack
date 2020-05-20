@@ -1,6 +1,6 @@
 {
   "name": "@bunchtogether/braid-messagepack",
-  "version": "1.1.10",
+  "version": "1.1.17",
   "main": "dist/index.js",
   "repository": "https://github.com/bunchtogether/braid-messagepack.git",
   "author": "johnwehr@bunchtogether.com",
@@ -12,51 +12,46 @@
     "lint": "npm run lint:js && npm run lint:flow",
     "lint:js": "eslint -c ./.eslintrc --no-eslintrc --fix --cache .",
     "lint:flow": "flow --show-all-errors",
-    "coverage": "codecov",
-    "start-pre-commit": "git stash -q --keep-index",
-    "end-pre-commit": "git add -u && git stash pop -q"
+    "coverage": "codecov"
   },
-  "pre-commit": [
-    "lint",
-    "start-pre-commit",
-    "build",
-    "end-pre-commit"
-  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint && yarn build && git add dist ./README.md"
+    }
+  },
   "jest": {
     "coverageDirectory": "./coverage/",
     "collectCoverage": true,
     "collectCoverageFrom": [
       "src/*.js",
       "src/**/*.js"
-    ],
-    "transform": {
-      "^.+\\.js(?:\\.flow)?$": "jest-flow-transform"
-    }
+    ]
   },
   "devDependencies": {
-    "babel-eslint": "^9.0.0",
-    "codecov": "^3.2.0",
-    "cross-env": "^5.2.0",
-    "documentation": "^9.3.0",
-    "eslint": "^5.14.1",
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-transform-flow-strip-types": "^7.9.0",
+    "babel-eslint": "^10.1.0",
+    "codecov": "^3.7.0",
+    "cross-env": "^7.0.2",
+    "documentation": "^13.0.0",
+    "eslint": "^7.0.0",
     "eslint-config-bunchtogether": "^1.1.6",
-    "eslint-plugin-flowtype": "^3.4.2",
-    "eslint-plugin-flowtype-errors": "^4.0.0",
-    "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-jest": "^22.3.0",
-    "eslint-plugin-jsx-a11y": "^6.2.1",
-    "eslint-plugin-react": "^7.12.4",
-    "expect": "^24.1.0",
-    "flow-bin": "^0.93.0",
-    "flow-copy-source": "^2.0.3",
-    "flow-remove-types": "^1.2.3",
-    "flow-typed": "^2.5.1",
-    "jest": "^24.1.0",
-    "jest-diff": "^24.0.0",
-    "jest-flow-transform": "^1.0.1",
-    "observed-remove": "^2.2.5",
+    "eslint-plugin-flowtype": "^5.1.0",
+    "eslint-plugin-flowtype-errors": "^4.3.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jest": "^23.13.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.20.0",
+    "expect": "^26.0.1",
+    "flow-bin": "^0.125.1",
+    "flow-copy-source": "^2.0.9",
+    "flow-remove-types": "^2.125.1",
+    "flow-typed": "^3.1.0",
+    "jest": "^26.0.1",
+    "jest-diff": "^26.0.1",
+    "observed-remove": "^2.2.26",
     "pre-commit": "^1.2.2",
-    "uuid": "^3.3.2"
+    "uuid": "^8.1.0"
   },
   "dependencies": {
     "msgpack5": "^4.2.1"

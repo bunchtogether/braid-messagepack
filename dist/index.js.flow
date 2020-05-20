@@ -14,7 +14,7 @@ class Credentials {
   constructor(value:Object) {
     this.value = value;
   }
-  value: Object;
+  declare value: Object;
 }
 
 function decodeCredentials(buffer: Buffer) {
@@ -26,7 +26,7 @@ class CredentialsResponse {
   constructor(value:{success: boolean, code: number, message: string}) {
     this.value = value;
   }
-  value: {success: boolean, code: number, message: string};
+  declare value: {success: boolean, code: number, message: string};
 }
 
 function decodeCredentialsResponse(buffer: Buffer) {
@@ -43,12 +43,12 @@ class PeerSync {
     this.activeProviders = activeProviders;
     this.peerSubscriptions = peerSubscriptions;
   }
-  id: number;
-  data: DataDump;
-  peers: PeerDump;
-  providers: ProviderDump;
-  activeProviders: ActiveProviderDump;
-  peerSubscriptions: PeerSubscriptionDump;
+  declare id: number;
+  declare data: DataDump;
+  declare peers: PeerDump;
+  declare providers: ProviderDump;
+  declare activeProviders: ActiveProviderDump;
+  declare peerSubscriptions: PeerSubscriptionDump;
 }
 
 function decodePeerSync(buffer: Buffer) {
@@ -64,7 +64,7 @@ class PeerSyncResponse {
   constructor(value:number) {
     this.value = value;
   }
-  value: number;
+  declare value: number;
 }
 
 function decodePeerSyncResponse(buffer: Buffer) {
@@ -77,8 +77,8 @@ class DataDump {
     this.queue = queue;
     this.ids = ids;
   }
-  queue:[Array<*>, Array<*>];
-  ids:Array<number>;
+  declare queue:[Array<*>, Array<*>];
+  declare ids:Array<number>;
 }
 
 function decodeDataDump(buffer: Buffer) {
@@ -95,8 +95,8 @@ class PeerDump {
     this.queue = queue;
     this.ids = ids;
   }
-  queue:[Array<*>, Array<*>];
-  ids:Array<number>;
+  declare queue:[Array<*>, Array<*>];
+  declare ids:Array<number>;
 }
 
 function decodePeerDump(buffer: Buffer) {
@@ -113,8 +113,8 @@ class ProviderDump {
     this.queue = queue;
     this.ids = ids;
   }
-  queue:[Array<*>, Array<*>];
-  ids:Array<number>;
+  declare queue:[Array<*>, Array<*>];
+  declare ids:Array<number>;
 }
 
 function decodeProviderDump(buffer: Buffer) {
@@ -131,8 +131,8 @@ class ActiveProviderDump {
     this.queue = queue;
     this.ids = ids;
   }
-  queue:[Array<*>, Array<*>];
-  ids:Array<number>;
+  declare queue:[Array<*>, Array<*>];
+  declare ids:Array<number>;
 }
 
 function decodeActiveProviderDump(buffer: Buffer) {
@@ -149,8 +149,8 @@ class PeerSubscriptionDump {
     this.queue = queue;
     this.ids = ids;
   }
-  queue:[Array<*>, Array<*>];
-  ids:Array<number>;
+  declare queue:[Array<*>, Array<*>];
+  declare ids:Array<number>;
 }
 
 function decodePeerSubscriptionDump(buffer: Buffer) {
@@ -166,7 +166,7 @@ class PeerRequest {
   constructor(value:number) {
     this.value = value;
   }
-  value: number;
+  declare value: number;
 }
 
 function decodePeerRequest(buffer: Buffer) {
@@ -178,7 +178,7 @@ class PeerResponse {
   constructor(value:{id?:number, success: boolean, code: number, message: string}) {
     this.value = value;
   }
-  value: {id?:number, success: boolean, code: number, message: string};
+  declare value: {id?:number, success: boolean, code: number, message: string};
 }
 
 function decodePeerResponse(buffer: Buffer) {
@@ -196,7 +196,7 @@ class SubscribeRequest {
   constructor(value:string) {
     this.value = value;
   }
-  value: string;
+  declare value: string;
 }
 
 function decodeSubscribeRequest(buffer: Buffer) {
@@ -208,7 +208,7 @@ class SubscribeResponse {
   constructor(value:{key:string, success: boolean, code: number, message: string}) {
     this.value = value;
   }
-  value: {key:string, success: boolean, code: number, message: string};
+  declare value: {key:string, success: boolean, code: number, message: string};
 }
 
 function decodeSubscribeResponse(buffer: Buffer) {
@@ -220,7 +220,7 @@ class Unsubscribe {
   constructor(value:string) {
     this.value = value;
   }
-  value: string;
+  declare value: string;
 }
 
 function decodeUnsubscribe(buffer: Buffer) {
@@ -232,7 +232,7 @@ class EventSubscribeRequest {
   constructor(value:string) {
     this.value = value;
   }
-  value: string;
+  declare value: string;
 }
 
 function decodeEventSubscribeRequest(buffer: Buffer) {
@@ -244,7 +244,7 @@ class EventSubscribeResponse {
   constructor(value:{name:string, success: boolean, code: number, message: string}) {
     this.value = value;
   }
-  value: {name:string, success: boolean, code: number, message: string};
+  declare value: {name:string, success: boolean, code: number, message: string};
 }
 
 function decodeEventSubscribeResponse(buffer: Buffer) {
@@ -256,7 +256,7 @@ class EventUnsubscribe {
   constructor(value:string) {
     this.value = value;
   }
-  value: string;
+  declare value: string;
 }
 
 function decodeEventUnsubscribe(buffer: Buffer) {
@@ -271,10 +271,10 @@ class BraidEvent {
     this.id = id;
     this.ids = ids;
   }
-  name: string;
-  args: Array<any>;
-  id: string;
-  ids:Array<number>;
+  declare name: string;
+  declare args: Array<any>;
+  declare id: string;
+  declare ids:Array<number>;
 }
 
 function decodeBraidEvent(buffer: Buffer) {

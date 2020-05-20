@@ -14,7 +14,7 @@ class Credentials {
   constructor(value       ) {
     this.value = value;
   }
-                
+                        
 }
 
 function decodeCredentials(buffer        ) {
@@ -26,7 +26,7 @@ class CredentialsResponse {
   constructor(value                                                  ) {
     this.value = value;
   }
-                                                           
+                                                                   
 }
 
 function decodeCredentialsResponse(buffer        ) {
@@ -43,12 +43,12 @@ class PeerSync {
     this.activeProviders = activeProviders;
     this.peerSubscriptions = peerSubscriptions;
   }
-             
-                 
-                  
+                     
+                         
                           
-                                      
-                                          
+                                  
+                                              
+                                                  
 }
 
 function decodePeerSync(buffer        ) {
@@ -64,7 +64,7 @@ class PeerSyncResponse {
   constructor(value       ) {
     this.value = value;
   }
-                
+                        
 }
 
 function decodePeerSyncResponse(buffer        ) {
@@ -77,8 +77,8 @@ class DataDump {
     this.queue = queue;
     this.ids = ids;
   }
-                             
-                    
+                                     
+                            
 }
 
 function decodeDataDump(buffer        ) {
@@ -95,8 +95,8 @@ class PeerDump {
     this.queue = queue;
     this.ids = ids;
   }
-                             
-                    
+                                     
+                            
 }
 
 function decodePeerDump(buffer        ) {
@@ -113,8 +113,8 @@ class ProviderDump {
     this.queue = queue;
     this.ids = ids;
   }
-                             
-                    
+                                     
+                            
 }
 
 function decodeProviderDump(buffer        ) {
@@ -131,8 +131,8 @@ class ActiveProviderDump {
     this.queue = queue;
     this.ids = ids;
   }
-                             
-                    
+                                     
+                            
 }
 
 function decodeActiveProviderDump(buffer        ) {
@@ -149,8 +149,8 @@ class PeerSubscriptionDump {
     this.queue = queue;
     this.ids = ids;
   }
-                             
-                    
+                                     
+                            
 }
 
 function decodePeerSubscriptionDump(buffer        ) {
@@ -166,7 +166,7 @@ class PeerRequest {
   constructor(value       ) {
     this.value = value;
   }
-                
+                        
 }
 
 function decodePeerRequest(buffer        ) {
@@ -178,7 +178,7 @@ class PeerResponse {
   constructor(value                                                              ) {
     this.value = value;
   }
-                                                                       
+                                                                               
 }
 
 function decodePeerResponse(buffer        ) {
@@ -196,7 +196,7 @@ class SubscribeRequest {
   constructor(value       ) {
     this.value = value;
   }
-                
+                        
 }
 
 function decodeSubscribeRequest(buffer        ) {
@@ -208,7 +208,7 @@ class SubscribeResponse {
   constructor(value                                                              ) {
     this.value = value;
   }
-                                                                       
+                                                                               
 }
 
 function decodeSubscribeResponse(buffer        ) {
@@ -220,7 +220,7 @@ class Unsubscribe {
   constructor(value       ) {
     this.value = value;
   }
-                
+                        
 }
 
 function decodeUnsubscribe(buffer        ) {
@@ -232,7 +232,7 @@ class EventSubscribeRequest {
   constructor(value       ) {
     this.value = value;
   }
-                
+                        
 }
 
 function decodeEventSubscribeRequest(buffer        ) {
@@ -244,7 +244,7 @@ class EventSubscribeResponse {
   constructor(value                                                               ) {
     this.value = value;
   }
-                                                                        
+                                                                                
 }
 
 function decodeEventSubscribeResponse(buffer        ) {
@@ -256,7 +256,7 @@ class EventUnsubscribe {
   constructor(value       ) {
     this.value = value;
   }
-                
+                        
 }
 
 function decodeEventUnsubscribe(buffer        ) {
@@ -271,10 +271,10 @@ class BraidEvent {
     this.id = id;
     this.ids = ids;
   }
-               
-                   
-             
-                    
+                       
+                           
+                     
+                            
 }
 
 function decodeBraidEvent(buffer        ) {
