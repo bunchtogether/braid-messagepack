@@ -23,6 +23,15 @@ const {
   PeerSubscriptionDump,
   PeerSync,
   PeerSyncResponse,
+  ReceiverDump,
+  PeerPublisherDump,
+  PublishRequest,
+  PublishResponse,
+  Unpublish,
+  PublisherOpen,
+  PublisherClose,
+  PublisherMessage,
+  PublisherPeerMessage,
   encode,
   decode,
 } = require('../src');
@@ -232,9 +241,10 @@ describe('Messagepack', () => {
     const dataDump = new DataDump([[], []], []);
     const peerDump = new PeerDump([[], []], []);
     const providerDump = new ProviderDump([[], []], []);
+    const receiverDump = new ReceiverDump([[], []], []);
     const activeProviderDump = new ActiveProviderDump([[], []], []);
     const peerSubscriptionDump = new PeerSubscriptionDump([[], []], []);
-    const peerSync = new PeerSync(id, dataDump, peerDump, providerDump, activeProviderDump, peerSubscriptionDump);
+    const peerSync = new PeerSync(id, dataDump, peerDump, providerDump, receiverDump, activeProviderDump, peerSubscriptionDump);
     const encoded = encode(peerSync);
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(PeerSync);
@@ -242,6 +252,7 @@ describe('Messagepack', () => {
     expect(decoded.data).toBeInstanceOf(DataDump);
     expect(decoded.peers).toBeInstanceOf(PeerDump);
     expect(decoded.providers).toBeInstanceOf(ProviderDump);
+    expect(decoded.receivers).toBeInstanceOf(ReceiverDump);
     expect(decoded.activeProviders).toBeInstanceOf(ActiveProviderDump);
     expect(decoded.peerSubscriptions).toBeInstanceOf(PeerSubscriptionDump);
   });
@@ -252,5 +263,115 @@ describe('Messagepack', () => {
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(PeerSyncResponse);
     expect(id).toEqual(decoded.value);
+  });
+  test('Should encode and decode receiver dumps', async () => {
+    const alice = new ObservedRemoveMap();
+    const bob = new ObservedRemoveMap();
+    const key = uuid.v4();
+    const value = {
+      [uuid.v4()]: uuid.v4(),
+    };
+    alice.set(key, value);
+    const ids = [randomInteger()];
+    const receiverDump = new ReceiverDump(alice.dump(), ids);
+    const encoded = encode(receiverDump);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(ReceiverDump);
+    bob.process(decoded.queue);
+    expect(bob.get(key)).toEqual(value);
+    expect(ids).toEqual(decoded.ids);
+  });
+  test('Should encode and decode publisher dumps', async () => {
+    const alice = new ObservedRemoveSet();
+    const bob = new ObservedRemoveSet();
+    const key = uuid.v4();
+    alice.add(key);
+    const ids = [randomInteger()];
+    const peerPublisherDump = new PeerPublisherDump(alice.dump(), ids);
+    const encoded = encode(peerPublisherDump);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(PeerPublisherDump);
+    bob.process(decoded.queue);
+    expect(bob.has(key)).toEqual(true);
+    expect(ids).toEqual(decoded.ids);
+  });
+  test('Should encode and decode publish requests', async () => {
+    const key = uuid.v4();
+    const publishRequest = new PublishRequest(key);
+    const encoded = encode(publishRequest);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(PublishRequest);
+    expect(key).toEqual(decoded.value);
+  });
+  test('Should encode and decode publish responses', async () => {
+    const key = uuid.v4();
+    const success = Math.random() > 0.5;
+    const code = Math.floor(Math.random() * 1000);
+    const message = uuid.v4();
+    const publishResponse = new PublishResponse({ key, success, code, message });
+    const encoded = encode(publishResponse);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(PublishResponse);
+    expect({ key, success, code, message }).toEqual(decoded.value);
+  });
+  test('Should encode and decode unpublishes', async () => {
+    const key = uuid.v4();
+    const unpublish = new Unpublish(key);
+    const encoded = encode(unpublish);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(Unpublish);
+    expect(key).toEqual(decoded.value);
+  });
+  test('Should encode and decode publisher open events', async () => {
+    const regexString = uuid.v4();
+    const key = uuid.v4();
+    const socketId = randomInteger();
+    const credentials = {
+      [uuid.v4()]: uuid.v4(),
+    };
+    const publisherOpen = new PublisherOpen(regexString, key, socketId, credentials);
+    const encoded = encode(publisherOpen);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(PublisherOpen);
+    expect(decoded.regexString).toEqual(regexString);
+    expect(decoded.key).toEqual(key);
+    expect(decoded.socketId).toEqual(socketId);
+    expect(decoded.credentials).toEqual(credentials);
+  });
+  test('Should encode and decode publisher close events', async () => {
+    const key = uuid.v4();
+    const socketId = randomInteger();
+    const publisherClose = new PublisherClose(key, socketId);
+    const encoded = encode(publisherClose);
+    const decoded = decode(encoded);
+    expect(decoded.key).toEqual(key);
+    expect(decoded).toBeInstanceOf(PublisherClose);
+    expect(decoded.socketId).toEqual(socketId);
+  });
+  test('Should encode and decode publisher message events', async () => {
+    const key = uuid.v4();
+    const message = {
+      [uuid.v4()]: uuid.v4(),
+    };
+    const publisherMessage = new PublisherMessage(key, message);
+    const encoded = encode(publisherMessage);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(PublisherMessage);
+    expect(decoded.key).toEqual(key);
+    expect(decoded.message).toEqual(message);
+  });
+  test('Should encode and decode publisher message events', async () => {
+    const key = uuid.v4();
+    const socketId = randomInteger();
+    const message = {
+      [uuid.v4()]: uuid.v4(),
+    };
+    const publisherPeerMessage = new PublisherPeerMessage(key, socketId, message);
+    const encoded = encode(publisherPeerMessage);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(PublisherPeerMessage);
+    expect(decoded.key).toEqual(key);
+    expect(decoded.socketId).toEqual(socketId);
+    expect(decoded.message).toEqual(message);
   });
 });

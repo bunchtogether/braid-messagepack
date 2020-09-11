@@ -35,11 +35,12 @@ function decodeCredentialsResponse(buffer: Buffer) {
 }
 
 class PeerSync {
-  constructor(id:number, data:DataDump, peers:PeerDump, providers:ProviderDump, activeProviders: ActiveProviderDump, peerSubscriptions: PeerSubscriptionDump) {
+  constructor(id:number, data:DataDump, peers:PeerDump, providers:ProviderDump, receivers:ReceiverDump, activeProviders: ActiveProviderDump, peerSubscriptions: PeerSubscriptionDump) {
     this.id = id;
     this.data = data;
     this.peers = peers;
     this.providers = providers;
+    this.receivers = receivers;
     this.activeProviders = activeProviders;
     this.peerSubscriptions = peerSubscriptions;
   }
@@ -47,17 +48,18 @@ class PeerSync {
   declare data: DataDump;
   declare peers: PeerDump;
   declare providers: ProviderDump;
+  declare receivers: ReceiverDump;
   declare activeProviders: ActiveProviderDump;
   declare peerSubscriptions: PeerSubscriptionDump;
 }
 
 function decodePeerSync(buffer: Buffer) {
   const decoded = msgpack.decode(buffer);
-  return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5]);
+  return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5], decoded[6]);
 }
 
 function encodePeerSync(peerSync: PeerSync) {
-  return msgpack.encode([peerSync.id, peerSync.data, peerSync.peers, peerSync.providers, peerSync.activeProviders, peerSync.peerSubscriptions]);
+  return msgpack.encode([peerSync.id, peerSync.data, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions]);
 }
 
 class PeerSyncResponse {
@@ -286,6 +288,157 @@ function encodeBraidEvent(event: BraidEvent) {
   return msgpack.encode([event.name, event.args, event.id, event.ids]);
 }
 
+
+class ReceiverDump {
+  constructor(queue:[Array<*>, Array<*>], ids?:Array<number> = []) {
+    this.queue = queue;
+    this.ids = ids;
+  }
+  declare queue:[Array<*>, Array<*>];
+  declare ids:Array<number>;
+}
+
+function decodeReceiverDump(buffer: Buffer) {
+  const decoded = msgpack.decode(buffer);
+  return new ReceiverDump(decoded[0], decoded[1]);
+}
+
+function encodeReceiverDump(dump: ReceiverDump) {
+  return msgpack.encode([dump.queue, dump.ids]);
+}
+
+class PeerPublisherDump {
+  constructor(queue:[Array<*>, Array<*>], ids?:Array<number> = []) {
+    this.queue = queue;
+    this.ids = ids;
+  }
+  declare queue:[Array<*>, Array<*>];
+  declare ids:Array<number>;
+}
+
+function decodePeerPublisherDump(buffer: Buffer) {
+  const decoded = msgpack.decode(buffer);
+  return new PeerPublisherDump(decoded[0], decoded[1]);
+}
+
+function encodePeerPublisherDump(dump: PeerPublisherDump) {
+  return msgpack.encode([dump.queue, dump.ids]);
+}
+
+class PublishRequest {
+  constructor(value:string) {
+    this.value = value;
+  }
+  declare value: string;
+}
+
+function decodePublishRequest(buffer: Buffer) {
+  const value = msgpack.decode(buffer);
+  return new PublishRequest(value);
+}
+
+class PublishResponse {
+  constructor(value:{key:string, success: boolean, code: number, message: string}) {
+    this.value = value;
+  }
+  declare value: {key:string, success: boolean, code: number, message: string};
+}
+
+function decodePublishResponse(buffer: Buffer) {
+  const value = msgpack.decode(buffer);
+  return new PublishResponse(value);
+}
+
+class Unpublish {
+  constructor(value:string) {
+    this.value = value;
+  }
+  declare value: string;
+}
+
+function decodeUnpublish(buffer: Buffer) {
+  const value = msgpack.decode(buffer);
+  return new Unpublish(value);
+}
+
+class PublisherOpen {
+  constructor(regexString:string, key:string, socketId:number, credentials: any) {
+    this.regexString = regexString;
+    this.key = key;
+    this.socketId = socketId;
+    this.credentials = credentials;
+  }
+  declare regexString:string;
+  declare key:string;
+  declare socketId:number;
+  declare credentials:any;
+}
+
+function decodePublisherOpen(buffer: Buffer) {
+  const decoded = msgpack.decode(buffer);
+  return new PublisherOpen(decoded[0], decoded[1], decoded[2], decoded[3]);
+}
+
+function encodePublisherOpen(message: PublisherOpen) {
+  return msgpack.encode([message.regexString, message.key, message.socketId, message.credentials]);
+}
+
+class PublisherClose {
+  constructor(key:string, socketId:number) {
+    this.key = key;
+    this.socketId = socketId;
+  }
+  declare key:string;
+  declare socketId:number;
+}
+
+function decodePublisherClose(buffer: Buffer) {
+  const decoded = msgpack.decode(buffer);
+  return new PublisherClose(decoded[0], decoded[1]);
+}
+
+function encodePublisherClose(message: PublisherClose) {
+  return msgpack.encode([message.key, message.socketId]);
+}
+
+class PublisherMessage {
+  constructor(key:string, message: any) {
+    this.key = key;
+    this.message = message;
+  }
+  declare key:string;
+  declare message:any;
+}
+
+function decodePublisherMessage(buffer: Buffer) {
+  const decoded = msgpack.decode(buffer);
+  return new PublisherMessage(decoded[0], decoded[1]);
+}
+
+function encodePublisherMessage(message: PublisherMessage) {
+  return msgpack.encode([message.key, message.message]);
+}
+
+class PublisherPeerMessage {
+  constructor(key:string, socketId:number, message: any) {
+    this.key = key;
+    this.socketId = socketId;
+    this.message = message;
+  }
+  declare key:string;
+  declare socketId:number;
+  declare message:any;
+}
+
+function decodePublisherPeerMessage(buffer: Buffer) {
+  const decoded = msgpack.decode(buffer);
+  return new PublisherPeerMessage(decoded[0], decoded[1], decoded[2]);
+}
+
+function encodePublisherPeerMessage(message: PublisherPeerMessage) {
+  return msgpack.encode([message.key, message.socketId, message.message]);
+}
+
 msgpack.register(0x1, Credentials, encode, decodeCredentials);
 msgpack.register(0x2, CredentialsResponse, encode, decodeCredentialsResponse);
 
@@ -310,6 +463,16 @@ msgpack.register(0x24, EventSubscribeResponse, encode, decodeEventSubscribeRespo
 msgpack.register(0x25, EventUnsubscribe, encode, decodeEventUnsubscribe);
 msgpack.register(0x26, BraidEvent, encodeBraidEvent, decodeBraidEvent);
 
+msgpack.register(0x30, ReceiverDump, encodeReceiverDump, decodeReceiverDump);
+msgpack.register(0x31, PeerPublisherDump, encodePeerPublisherDump, decodePeerPublisherDump);
+msgpack.register(0x32, PublishRequest, encode, decodePublishRequest);
+msgpack.register(0x33, PublishResponse, encode, decodePublishResponse);
+msgpack.register(0x34, Unpublish, encode, decodeUnpublish);
+msgpack.register(0x35, PublisherOpen, encodePublisherOpen, decodePublisherOpen);
+msgpack.register(0x36, PublisherClose, encodePublisherClose, decodePublisherClose);
+msgpack.register(0x37, PublisherMessage, encodePublisherMessage, decodePublisherMessage);
+msgpack.register(0x38, PublisherPeerMessage, encodePublisherPeerMessage, decodePublisherPeerMessage);
+
 module.exports.DataDump = DataDump;
 module.exports.ProviderDump = ProviderDump;
 module.exports.ActiveProviderDump = ActiveProviderDump;
@@ -329,6 +492,15 @@ module.exports.BraidEvent = BraidEvent;
 module.exports.PeerRequest = PeerRequest;
 module.exports.PeerResponse = PeerResponse;
 module.exports.Unpeer = Unpeer;
+module.exports.ReceiverDump = ReceiverDump;
+module.exports.PublisherOpen = PublisherOpen;
+module.exports.PublisherClose = PublisherClose;
+module.exports.PublisherMessage = PublisherMessage;
+module.exports.PublisherPeerMessage = PublisherPeerMessage;
+module.exports.PeerPublisherDump = PeerPublisherDump;
+module.exports.PublishRequest = PublishRequest;
+module.exports.PublishResponse = PublishResponse;
+module.exports.Unpublish = Unpublish;
 module.exports.encode = msgpack.encode;
 module.exports.decode = msgpack.decode;
 module.exports.getArrayBuffer = (b: Buffer) => b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
