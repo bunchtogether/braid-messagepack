@@ -74,6 +74,93 @@ function decodePeerSyncResponse(buffer: Buffer) {
   return new PeerSyncResponse(value);
 }
 
+let incrementedChunkId = (Math.random() * 4294967296) >>> 0;
+
+class MergeChunksPromise extends Promise<Buffer> {
+  declare chunkCallbacks: Array<(MultipartContainer) => void>;
+  constructor(timeoutDuration: number) {
+    const chunkCallbacks = [];
+    super((resolve, reject) => {
+      let id;
+      let merged;
+      let bytesReceived = 0;
+      const timeoutHandler = () => {
+        reject(new Error(`MultipartContainer chunk timeout error after ${timeoutDuration}ms`));
+      };
+      let timeout = setTimeout(timeoutHandler, timeoutDuration);
+      const addChunk = (multipartContainer:MultipartContainer) => {
+        if (typeof id === 'undefined' || typeof merged === 'undefined') {
+          id = multipartContainer.id;
+          merged = Buffer.alloc(multipartContainer.length);
+        } else if (multipartContainer.id !== id) {
+          return;
+        }
+        clearTimeout(timeout);
+        multipartContainer.buffer.copy(merged, multipartContainer.position);
+        bytesReceived += multipartContainer.buffer.length;
+        if (bytesReceived < multipartContainer.length) {
+          timeout = setTimeout(timeoutHandler, timeoutDuration);
+          return;
+        }
+        resolve(merged);
+      };
+      chunkCallbacks.push(addChunk);
+    });
+    this.chunkCallbacks = chunkCallbacks;
+  }
+
+  push(multipartContainer:MultipartContainer) {
+    for (const chunkCallback of this.chunkCallbacks) {
+      chunkCallback(multipartContainer);
+    }
+  }
+
+  // $FlowFixMe
+  static get [Symbol.species]() {
+    return Promise;
+  }
+
+  // $FlowFixMe
+  get [Symbol.toStringTag]() {
+    return 'MergeChunksPromise';
+  }
+}
+
+class MultipartContainer {
+  static chunk = (buffer:Buffer, size:number) => {
+    const chunks = [];
+    for (let i = 0; i * size < buffer.length; i += 1) {
+      const slice = buffer.slice(i * size, (i + 1) * size);
+      chunks.push(msgpack.encode(new MultipartContainer(incrementedChunkId, i * size, buffer.length, slice)));
+    }
+    incrementedChunkId += 1;
+    if (incrementedChunkId > 4294967294) {
+      incrementedChunkId = 0;
+    }
+    return chunks;
+  }
+  static getMergeChunksPromise = (timeoutDuration: number) => new MergeChunksPromise(timeoutDuration)
+  constructor(id:number, position:number, length: number, buffer:Buffer) {
+    this.id = id;
+    this.position = position;
+    this.length = length;
+    this.buffer = buffer;
+  }
+  declare id:number;
+  declare position:number;
+  declare length:number;
+  declare buffer:Buffer;
+}
+
+function decodeMultipartContainer(buffer: Buffer) {
+  const decoded = msgpack.decode(buffer);
+  return new MultipartContainer(decoded[0], decoded[1], decoded[2], decoded[3]);
+}
+
+function encodeMultipartContainer(multipartContainer: MultipartContainer) {
+  return msgpack.encode([multipartContainer.id, multipartContainer.position, multipartContainer.length, multipartContainer.buffer]);
+}
+
 class DataDump {
   constructor(queue:[Array<*>, Array<*>], ids?:Array<number> = []) {
     this.queue = queue;
@@ -473,6 +560,8 @@ msgpack.register(0x36, PublisherClose, encodePublisherClose, decodePublisherClos
 msgpack.register(0x37, PublisherMessage, encodePublisherMessage, decodePublisherMessage);
 msgpack.register(0x38, PublisherPeerMessage, encodePublisherPeerMessage, decodePublisherPeerMessage);
 
+msgpack.register(0x40, MultipartContainer, encodeMultipartContainer, decodeMultipartContainer);
+
 module.exports.DataDump = DataDump;
 module.exports.ProviderDump = ProviderDump;
 module.exports.ActiveProviderDump = ActiveProviderDump;
@@ -501,6 +590,8 @@ module.exports.PeerPublisherDump = PeerPublisherDump;
 module.exports.PublishRequest = PublishRequest;
 module.exports.PublishResponse = PublishResponse;
 module.exports.Unpublish = Unpublish;
+module.exports.MultipartContainer = MultipartContainer;
+module.exports.MergeChunksPromise = MergeChunksPromise;
 module.exports.encode = msgpack.encode;
 module.exports.decode = msgpack.decode;
 module.exports.getArrayBuffer = (b: Buffer) => b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);

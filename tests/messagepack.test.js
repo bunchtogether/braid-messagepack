@@ -32,6 +32,7 @@ const {
   PublisherClose,
   PublisherMessage,
   PublisherPeerMessage,
+  MultipartContainer,
   encode,
   decode,
 } = require('../src');
@@ -373,5 +374,31 @@ describe('Messagepack', () => {
     expect(decoded.key).toEqual(key);
     expect(decoded.socketId).toEqual(socketId);
     expect(decoded.message).toEqual(message);
+  });
+  test('Should encode and decode multipart containers', async () => {
+    const id = randomInteger();
+    const position = Math.round(100 * Math.random());
+    const length = 100 + Math.round(100 * Math.random());
+    const buffer = crypto.randomBytes(Math.round(100 * Math.random()));
+    const multipartContainer = new MultipartContainer(id, position, length, buffer);
+    const encoded = encode(multipartContainer);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(MultipartContainer);
+    expect(decoded.position).toEqual(position);
+    expect(decoded.length).toEqual(length);
+    expect(decoded.buffer.equals(buffer)).toEqual(true);
+  });
+  test('Should chunk and combine', async () => {
+    const data = crypto.randomBytes(1024 * 1024);
+    const buffer = encode({ data });
+    const chunks = MultipartContainer.chunk(buffer, Math.round(Math.random() * 1024 * 1024));
+    expect(chunks.reduce((acc, chunk) => acc + decode(chunk).buffer.length, 0)).toEqual(buffer.length);
+    const mergeChunksPromise = MultipartContainer.getMergeChunksPromise(1000);
+    for (const chunk of chunks) {
+      mergeChunksPromise.push(decode(chunk));
+    }
+    const mergedChunksBuffer = await mergeChunksPromise;
+    expect(buffer.equals(mergedChunksBuffer)).toEqual(true);
+    expect(decode(mergedChunksBuffer).data).toEqual(data);
   });
 });
