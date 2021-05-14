@@ -12,12 +12,8 @@
     "lint": "npm run lint:js && npm run lint:flow",
     "lint:js": "eslint -c ./.eslintrc --no-eslintrc --fix --cache .",
     "lint:flow": "flow --show-all-errors",
-    "coverage": "codecov"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn lint && yarn build && git add dist ./README.md"
-    }
+    "coverage": "codecov",
+    "prepare": "husky install"
   },
   "jest": {
     "coverageDirectory": "./coverage/",
@@ -47,6 +43,7 @@
     "flow-copy-source": "^2.0.9",
     "flow-remove-types": "^2.151.0",
     "flow-typed": "^3.3.1",
+    "husky": "^6.0.0",
     "jest": "^26.6.3",
     "jest-diff": "^26.6.2",
     "observed-remove": "^2.2.27",
