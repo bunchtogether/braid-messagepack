@@ -35,9 +35,8 @@ function decodeCredentialsResponse(buffer: Buffer) {
 }
 
 class PeerSync {
-  constructor(id:number, data:DataDump, peers:PeerDump, providers:ProviderDump, receivers:ReceiverDump, activeProviders: ActiveProviderDump, peerSubscriptions: PeerSubscriptionDump) {
+  constructor(id:number, peers:PeerDump, providers:ProviderDump, receivers:ReceiverDump, activeProviders: ActiveProviderDump, peerSubscriptions: PeerSubscriptionDump) {
     this.id = id;
-    this.data = data;
     this.peers = peers;
     this.providers = providers;
     this.receivers = receivers;
@@ -45,7 +44,6 @@ class PeerSync {
     this.peerSubscriptions = peerSubscriptions;
   }
   declare id: number;
-  declare data: DataDump;
   declare peers: PeerDump;
   declare providers: ProviderDump;
   declare receivers: ReceiverDump;
@@ -55,11 +53,11 @@ class PeerSync {
 
 function decodePeerSync(buffer: Buffer) {
   const decoded = msgpack.decode(buffer);
-  return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5], decoded[6]);
+  return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5]);
 }
 
 function encodePeerSync(peerSync: PeerSync) {
-  return msgpack.encode([peerSync.id, peerSync.data, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions]);
+  return msgpack.encode([peerSync.id, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions]);
 }
 
 class PeerSyncResponse {
@@ -177,6 +175,38 @@ function decodeDataDump(buffer: Buffer) {
 
 function encodeDataDump(dump: DataDump) {
   return msgpack.encode([dump.queue, dump.ids]);
+}
+
+class DataSyncInsertions {
+  constructor(insertions: Array<*>) {
+    this.insertions = insertions;
+  }
+  declare insertions:Array<*>;
+}
+
+function decodeDataSyncInsertions(buffer: Buffer) {
+  const decoded = msgpack.decode(buffer);
+  return new DataSyncInsertions(decoded);
+}
+
+function encodeDataSyncInsertions(dataSync: DataSyncInsertions) {
+  return msgpack.encode(dataSync.insertions);
+}
+
+class DataSyncDeletions {
+  constructor(deletions: Array<*>) {
+    this.deletions = deletions;
+  }
+  declare deletions:Array<*>;
+}
+
+function decodeDataSyncDeletions(buffer: Buffer) {
+  const decoded = msgpack.decode(buffer);
+  return new DataSyncDeletions(decoded);
+}
+
+function encodeDataSyncDeletions(dataSync: DataSyncDeletions) {
+  return msgpack.encode(dataSync.deletions);
 }
 
 class PeerDump {
@@ -561,6 +591,8 @@ msgpack.register(0x37, PublisherMessage, encodePublisherMessage, decodePublisher
 msgpack.register(0x38, PublisherPeerMessage, encodePublisherPeerMessage, decodePublisherPeerMessage);
 
 msgpack.register(0x40, MultipartContainer, encodeMultipartContainer, decodeMultipartContainer);
+msgpack.register(0x41, DataSyncInsertions, encodeDataSyncInsertions, decodeDataSyncInsertions);
+msgpack.register(0x42, DataSyncDeletions, encodeDataSyncDeletions, decodeDataSyncDeletions);
 
 module.exports.DataDump = DataDump;
 module.exports.ProviderDump = ProviderDump;
@@ -592,6 +624,8 @@ module.exports.PublishResponse = PublishResponse;
 module.exports.Unpublish = Unpublish;
 module.exports.MultipartContainer = MultipartContainer;
 module.exports.MergeChunksPromise = MergeChunksPromise;
+module.exports.DataSyncInsertions = DataSyncInsertions;
+module.exports.DataSyncDeletions = DataSyncDeletions;
 module.exports.encode = msgpack.encode;
 module.exports.decode = msgpack.decode;
 module.exports.getArrayBuffer = (b: Buffer) => b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);

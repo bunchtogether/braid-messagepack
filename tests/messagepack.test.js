@@ -33,6 +33,8 @@ const {
   PublisherMessage,
   PublisherPeerMessage,
   MultipartContainer,
+  DataSyncInsertions,
+  DataSyncDeletions,
   encode,
   decode,
 } = require('../src');
@@ -239,18 +241,16 @@ describe('Messagepack', () => {
   });
   test('Should encode and decode peer syncs', async () => {
     const id = randomInteger();
-    const dataDump = new DataDump([[], []], []);
     const peerDump = new PeerDump([[], []], []);
     const providerDump = new ProviderDump([[], []], []);
     const receiverDump = new ReceiverDump([[], []], []);
     const activeProviderDump = new ActiveProviderDump([[], []], []);
     const peerSubscriptionDump = new PeerSubscriptionDump([[], []], []);
-    const peerSync = new PeerSync(id, dataDump, peerDump, providerDump, receiverDump, activeProviderDump, peerSubscriptionDump);
+    const peerSync = new PeerSync(id, peerDump, providerDump, receiverDump, activeProviderDump, peerSubscriptionDump);
     const encoded = encode(peerSync);
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(PeerSync);
     expect(decoded.id).toEqual(id);
-    expect(decoded.data).toBeInstanceOf(DataDump);
     expect(decoded.peers).toBeInstanceOf(PeerDump);
     expect(decoded.providers).toBeInstanceOf(ProviderDump);
     expect(decoded.receivers).toBeInstanceOf(ReceiverDump);
@@ -400,5 +400,29 @@ describe('Messagepack', () => {
     const mergedChunksBuffer = await mergeChunksPromise;
     expect(buffer.equals(mergedChunksBuffer)).toEqual(true);
     expect(decode(mergedChunksBuffer).data).toEqual(data);
+  });
+  test('Should encode and decode data sync insertions', async () => {
+    const insertions = [
+      [uuid.v4(), [uuid.v4(), uuid.v4()]],
+      [uuid.v4(), [uuid.v4(), uuid.v4()]],
+      [uuid.v4(), [uuid.v4(), uuid.v4()]],
+    ];
+    const dataSyncInsertions = new DataSyncInsertions(insertions);
+    const encoded = encode(dataSyncInsertions);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(DataSyncInsertions);
+    expect(decoded.insertions).toEqual(insertions);
+  });
+  test('Should encode and decode data sync deletions', async () => {
+    const deletions = [
+      [uuid.v4(), uuid.v4()],
+      [uuid.v4(), uuid.v4()],
+      [uuid.v4(), uuid.v4()],
+    ];
+    const dataSyncDeletions = new DataSyncDeletions(deletions);
+    const encoded = encode(dataSyncDeletions);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(DataSyncDeletions);
+    expect(decoded.deletions).toEqual(deletions);
   });
 });
