@@ -1,10 +1,9 @@
-// @flow
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 import msgpack5 from 'msgpack5';
-
 const msgpack = msgpack5();
 
-function defaultEncode(o: {value: any}) {
+function defaultEncode(o) {
   return msgpack.encode(o.value);
 }
 
@@ -13,31 +12,31 @@ function encodeEmpty() {
 }
 
 export class Credentials {
-  constructor(value:Object) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: Object;
+
 }
 
-function decodeCredentials(buffer: Buffer) {
+function decodeCredentials(buffer) {
   const value = msgpack.decode(buffer);
   return new Credentials(value);
 }
 
 export class CredentialsResponse {
-  constructor(value:{success: boolean, code: number, message: string}) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: {success: boolean, code: number, message: string};
+
 }
 
-function decodeCredentialsResponse(buffer: Buffer) {
+function decodeCredentialsResponse(buffer) {
   const value = msgpack.decode(buffer);
   return new CredentialsResponse(value);
 }
 
 export class PeerSync {
-  constructor(id:number, peers:PeerDump, providers:ProviderDump, receivers:ReceiverDump, activeProviders: ActiveProviderDump, peerSubscriptions: PeerSubscriptionDump) {
+  constructor(id, peers, providers, receivers, activeProviders, peerSubscriptions) {
     this.id = id;
     this.peers = peers;
     this.providers = providers;
@@ -45,264 +44,262 @@ export class PeerSync {
     this.activeProviders = activeProviders;
     this.peerSubscriptions = peerSubscriptions;
   }
-  declare id: number;
-  declare peers: PeerDump;
-  declare providers: ProviderDump;
-  declare receivers: ReceiverDump;
-  declare activeProviders: ActiveProviderDump;
-  declare peerSubscriptions: PeerSubscriptionDump;
+
 }
 
-function decodePeerSync(buffer: Buffer) {
+function decodePeerSync(buffer) {
   const decoded = msgpack.decode(buffer);
   return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5]);
 }
 
-function encodePeerSync(peerSync: PeerSync) {
+function encodePeerSync(peerSync) {
   return msgpack.encode([peerSync.id, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions]);
 }
 
 export class PeerSyncResponse {
-  constructor(value:number) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: number;
+
 }
 
-function decodePeerSyncResponse(buffer: Buffer) {
+function decodePeerSyncResponse(buffer) {
   const value = msgpack.decode(buffer);
   return new PeerSyncResponse(value);
 }
 
-let incrementedChunkId = (Math.random() * 4294967296) >>> 0;
-
-export class MergeChunksPromise extends Promise<Buffer> {
-  declare chunkCallbacks: Array<(MultipartContainer) => void>;
-  constructor(timeoutDuration: number) {
+let incrementedChunkId = Math.random() * 4294967296 >>> 0;
+export class MergeChunksPromise extends Promise {
+  constructor(timeoutDuration) {
     const chunkCallbacks = [];
     super((resolve, reject) => {
       let id;
       let merged;
       let bytesReceived = 0;
+
       const timeoutHandler = () => {
         reject(new Error(`MultipartContainer chunk timeout error after ${timeoutDuration}ms`));
       };
+
       let timeout = setTimeout(timeoutHandler, timeoutDuration);
-      const addChunk = (multipartContainer:MultipartContainer) => {
+
+      const addChunk = multipartContainer => {
         if (typeof id === 'undefined' || typeof merged === 'undefined') {
           id = multipartContainer.id;
           merged = Buffer.alloc(multipartContainer.length);
         } else if (multipartContainer.id !== id) {
           return;
         }
+
         clearTimeout(timeout);
         multipartContainer.buffer.copy(merged, multipartContainer.position);
         bytesReceived += multipartContainer.buffer.length;
+
         if (bytesReceived < multipartContainer.length) {
           timeout = setTimeout(timeoutHandler, timeoutDuration);
           return;
         }
+
         resolve(merged);
       };
+
       chunkCallbacks.push(addChunk);
     });
     this.chunkCallbacks = chunkCallbacks;
   }
 
-  push(multipartContainer:MultipartContainer) {
+  push(multipartContainer) {
     for (const chunkCallback of this.chunkCallbacks) {
       chunkCallback(multipartContainer);
     }
-  }
+  } // $FlowFixMe
 
-  // $FlowFixMe
+
   static get [Symbol.species]() {
     return Promise;
-  }
+  } // $FlowFixMe
 
-  // $FlowFixMe
+
   get [Symbol.toStringTag]() {
     return 'MergeChunksPromise';
   }
-}
 
+}
 export class MultipartContainer {
-  static chunk = (buffer:Buffer, size:number) => {
-    const chunks = [];
-    for (let i = 0; i * size < buffer.length; i += 1) {
-      const slice = buffer.slice(i * size, (i + 1) * size);
-      chunks.push(msgpack.encode(new MultipartContainer(incrementedChunkId, i * size, buffer.length, slice)));
-    }
-    incrementedChunkId += 1;
-    if (incrementedChunkId > 4294967294) {
-      incrementedChunkId = 0;
-    }
-    return chunks;
-  }
-  static getMergeChunksPromise = (timeoutDuration: number) => new MergeChunksPromise(timeoutDuration)
-  constructor(id:number, position:number, length: number, buffer:Buffer) {
+  constructor(id, position, length, buffer) {
     this.id = id;
     this.position = position;
     this.length = length;
     this.buffer = buffer;
   }
-  declare id:number;
-  declare position:number;
-  declare length:number;
-  declare buffer:Buffer;
+
 }
 
-function decodeMultipartContainer(buffer: Buffer) {
+_defineProperty(MultipartContainer, "chunk", (buffer, size) => {
+  const chunks = [];
+
+  for (let i = 0; i * size < buffer.length; i += 1) {
+    const slice = buffer.slice(i * size, (i + 1) * size);
+    chunks.push(msgpack.encode(new MultipartContainer(incrementedChunkId, i * size, buffer.length, slice)));
+  }
+
+  incrementedChunkId += 1;
+
+  if (incrementedChunkId > 4294967294) {
+    incrementedChunkId = 0;
+  }
+
+  return chunks;
+});
+
+_defineProperty(MultipartContainer, "getMergeChunksPromise", timeoutDuration => new MergeChunksPromise(timeoutDuration));
+
+function decodeMultipartContainer(buffer) {
   const decoded = msgpack.decode(buffer);
   return new MultipartContainer(decoded[0], decoded[1], decoded[2], decoded[3]);
 }
 
-function encodeMultipartContainer(multipartContainer: MultipartContainer) {
+function encodeMultipartContainer(multipartContainer) {
   return msgpack.encode([multipartContainer.id, multipartContainer.position, multipartContainer.length, multipartContainer.buffer]);
 }
 
 export class DataDump {
-  constructor(queue:[Array<*>, Array<*>], ids?:Array<number> = []) {
+  constructor(queue, ids = []) {
     this.queue = queue;
     this.ids = ids;
   }
-  declare queue:[Array<*>, Array<*>];
-  declare ids:Array<number>;
+
 }
 
-function decodeDataDump(buffer: Buffer) {
+function decodeDataDump(buffer) {
   const decoded = msgpack.decode(buffer);
   return new DataDump(decoded[0], decoded[1]);
 }
 
-function encodeDataDump(dump: DataDump) {
+function encodeDataDump(dump) {
   return msgpack.encode([dump.queue, dump.ids]);
 }
 
 export class DataSyncInsertions {
-  constructor(insertions: Array<*>) {
+  constructor(insertions) {
     this.insertions = insertions;
   }
-  declare insertions:Array<*>;
+
 }
 
-function decodeDataSyncInsertions(buffer: Buffer) {
+function decodeDataSyncInsertions(buffer) {
   const decoded = msgpack.decode(buffer);
   return new DataSyncInsertions(decoded);
 }
 
-function encodeDataSyncInsertions(dataSync: DataSyncInsertions) {
+function encodeDataSyncInsertions(dataSync) {
   return msgpack.encode(dataSync.insertions);
 }
 
 export class DataSyncDeletions {
-  constructor(deletions: Array<*>) {
+  constructor(deletions) {
     this.deletions = deletions;
   }
-  declare deletions:Array<*>;
+
 }
 
-function decodeDataSyncDeletions(buffer: Buffer) {
+function decodeDataSyncDeletions(buffer) {
   const decoded = msgpack.decode(buffer);
   return new DataSyncDeletions(decoded);
 }
 
-function encodeDataSyncDeletions(dataSync: DataSyncDeletions) {
+function encodeDataSyncDeletions(dataSync) {
   return msgpack.encode(dataSync.deletions);
 }
 
 export class PeerDump {
-  constructor(queue:[Array<*>, Array<*>], ids?:Array<number> = []) {
+  constructor(queue, ids = []) {
     this.queue = queue;
     this.ids = ids;
   }
-  declare queue:[Array<*>, Array<*>];
-  declare ids:Array<number>;
+
 }
 
-function decodePeerDump(buffer: Buffer) {
+function decodePeerDump(buffer) {
   const decoded = msgpack.decode(buffer);
   return new PeerDump(decoded[0], decoded[1]);
 }
 
-function encodePeerDump(dump: PeerDump) {
+function encodePeerDump(dump) {
   return msgpack.encode([dump.queue, dump.ids]);
 }
 
 export class ProviderDump {
-  constructor(queue:[Array<*>, Array<*>], ids?:Array<number> = []) {
+  constructor(queue, ids = []) {
     this.queue = queue;
     this.ids = ids;
   }
-  declare queue:[Array<*>, Array<*>];
-  declare ids:Array<number>;
+
 }
 
-function decodeProviderDump(buffer: Buffer) {
+function decodeProviderDump(buffer) {
   const decoded = msgpack.decode(buffer);
   return new ProviderDump(decoded[0], decoded[1]);
 }
 
-function encodeProviderDump(dump: ProviderDump) {
+function encodeProviderDump(dump) {
   return msgpack.encode([dump.queue, dump.ids]);
 }
 
 export class ActiveProviderDump {
-  constructor(queue:[Array<*>, Array<*>], ids?:Array<number> = []) {
+  constructor(queue, ids = []) {
     this.queue = queue;
     this.ids = ids;
   }
-  declare queue:[Array<*>, Array<*>];
-  declare ids:Array<number>;
+
 }
 
-function decodeActiveProviderDump(buffer: Buffer) {
+function decodeActiveProviderDump(buffer) {
   const decoded = msgpack.decode(buffer);
   return new ActiveProviderDump(decoded[0], decoded[1]);
 }
 
-function encodeActiveProviderDump(dump: ActiveProviderDump) {
+function encodeActiveProviderDump(dump) {
   return msgpack.encode([dump.queue, dump.ids]);
 }
 
 export class PeerSubscriptionDump {
-  constructor(queue:[Array<*>, Array<*>], ids?:Array<number> = []) {
+  constructor(queue, ids = []) {
     this.queue = queue;
     this.ids = ids;
   }
-  declare queue:[Array<*>, Array<*>];
-  declare ids:Array<number>;
+
 }
 
-function decodePeerSubscriptionDump(buffer: Buffer) {
+function decodePeerSubscriptionDump(buffer) {
   const decoded = msgpack.decode(buffer);
   return new PeerSubscriptionDump(decoded[0], decoded[1]);
 }
 
-function encodePeerSubscriptionDump(dump: PeerSubscriptionDump) {
+function encodePeerSubscriptionDump(dump) {
   return msgpack.encode([dump.queue, dump.ids]);
 }
 
 export class PeerRequest {
-  constructor(value:number) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: number;
+
 }
 
-function decodePeerRequest(buffer: Buffer) {
+function decodePeerRequest(buffer) {
   const value = msgpack.decode(buffer);
   return new PeerRequest(value);
 }
 
 export class PeerResponse {
-  constructor(value:{id?:number, success: boolean, code: number, message: string}) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: {id?:number, success: boolean, code: number, message: string};
+
 }
 
-function decodePeerResponse(buffer: Buffer) {
+function decodePeerResponse(buffer) {
   const value = msgpack.decode(buffer);
   return new PeerResponse(value);
 }
@@ -314,266 +311,249 @@ function decodeUnpeer() {
 }
 
 export class SubscribeRequest {
-  constructor(value:string) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: string;
+
 }
 
-function decodeSubscribeRequest(buffer: Buffer) {
+function decodeSubscribeRequest(buffer) {
   const value = msgpack.decode(buffer);
   return new SubscribeRequest(value);
 }
 
 export class SubscribeResponse {
-  constructor(value:{key:string, success: boolean, code: number, message: string}) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: {key:string, success: boolean, code: number, message: string};
+
 }
 
-function decodeSubscribeResponse(buffer: Buffer) {
+function decodeSubscribeResponse(buffer) {
   const value = msgpack.decode(buffer);
   return new SubscribeResponse(value);
 }
 
 export class Unsubscribe {
-  constructor(value:string) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: string;
+
 }
 
-function decodeUnsubscribe(buffer: Buffer) {
+function decodeUnsubscribe(buffer) {
   const value = msgpack.decode(buffer);
   return new Unsubscribe(value);
 }
 
 export class EventSubscribeRequest {
-  constructor(value:string) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: string;
+
 }
 
-function decodeEventSubscribeRequest(buffer: Buffer) {
+function decodeEventSubscribeRequest(buffer) {
   const value = msgpack.decode(buffer);
   return new EventSubscribeRequest(value);
 }
 
 export class EventSubscribeResponse {
-  constructor(value:{name:string, success: boolean, code: number, message: string}) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: {name:string, success: boolean, code: number, message: string};
+
 }
 
-function decodeEventSubscribeResponse(buffer: Buffer) {
+function decodeEventSubscribeResponse(buffer) {
   const value = msgpack.decode(buffer);
   return new EventSubscribeResponse(value);
 }
 
 export class EventUnsubscribe {
-  constructor(value:string) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: string;
+
 }
 
-function decodeEventUnsubscribe(buffer: Buffer) {
+function decodeEventUnsubscribe(buffer) {
   const value = msgpack.decode(buffer);
   return new EventUnsubscribe(value);
 }
 
 export class BraidEvent {
-  constructor(name: string, args:Array<any>, id:string, ids?:Array<number> = []) {
+  constructor(name, args, id, ids = []) {
     this.name = name;
     this.args = args;
     this.id = id;
     this.ids = ids;
   }
-  declare name: string;
-  declare args: Array<any>;
-  declare id: string;
-  declare ids:Array<number>;
+
 }
 
-function decodeBraidEvent(buffer: Buffer) {
+function decodeBraidEvent(buffer) {
   const decoded = msgpack.decode(buffer);
   return new BraidEvent(decoded[0], decoded[1], decoded[2], decoded[3]);
 }
 
-function encodeBraidEvent(event: BraidEvent) {
+function encodeBraidEvent(event) {
   return msgpack.encode([event.name, event.args, event.id, event.ids]);
 }
 
-
 export class ReceiverDump {
-  constructor(queue:[Array<*>, Array<*>], ids?:Array<number> = []) {
+  constructor(queue, ids = []) {
     this.queue = queue;
     this.ids = ids;
   }
-  declare queue:[Array<*>, Array<*>];
-  declare ids:Array<number>;
+
 }
 
-function decodeReceiverDump(buffer: Buffer) {
+function decodeReceiverDump(buffer) {
   const decoded = msgpack.decode(buffer);
   return new ReceiverDump(decoded[0], decoded[1]);
 }
 
-function encodeReceiverDump(dump: ReceiverDump) {
+function encodeReceiverDump(dump) {
   return msgpack.encode([dump.queue, dump.ids]);
 }
 
 export class PeerPublisherDump {
-  constructor(queue:[Array<*>, Array<*>], ids?:Array<number> = []) {
+  constructor(queue, ids = []) {
     this.queue = queue;
     this.ids = ids;
   }
-  declare queue:[Array<*>, Array<*>];
-  declare ids:Array<number>;
+
 }
 
-function decodePeerPublisherDump(buffer: Buffer) {
+function decodePeerPublisherDump(buffer) {
   const decoded = msgpack.decode(buffer);
   return new PeerPublisherDump(decoded[0], decoded[1]);
 }
 
-function encodePeerPublisherDump(dump: PeerPublisherDump) {
+function encodePeerPublisherDump(dump) {
   return msgpack.encode([dump.queue, dump.ids]);
 }
 
 export class PublishRequest {
-  constructor(value:string) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: string;
+
 }
 
-function decodePublishRequest(buffer: Buffer) {
+function decodePublishRequest(buffer) {
   const value = msgpack.decode(buffer);
   return new PublishRequest(value);
 }
 
 export class PublishResponse {
-  constructor(value:{key:string, success: boolean, code: number, message: string}) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: {key:string, success: boolean, code: number, message: string};
+
 }
 
-function decodePublishResponse(buffer: Buffer) {
+function decodePublishResponse(buffer) {
   const value = msgpack.decode(buffer);
   return new PublishResponse(value);
 }
 
 export class Unpublish {
-  constructor(value:string) {
+  constructor(value) {
     this.value = value;
   }
-  declare value: string;
+
 }
 
-function decodeUnpublish(buffer: Buffer) {
+function decodeUnpublish(buffer) {
   const value = msgpack.decode(buffer);
   return new Unpublish(value);
 }
 
 export class PublisherOpen {
-  constructor(regexString:string, key:string, socketId:number, credentials: any) {
+  constructor(regexString, key, socketId, credentials) {
     this.regexString = regexString;
     this.key = key;
     this.socketId = socketId;
     this.credentials = credentials;
   }
-  declare regexString:string;
-  declare key:string;
-  declare socketId:number;
-  declare credentials:any;
+
 }
 
-function decodePublisherOpen(buffer: Buffer) {
+function decodePublisherOpen(buffer) {
   const decoded = msgpack.decode(buffer);
   return new PublisherOpen(decoded[0], decoded[1], decoded[2], decoded[3]);
 }
 
-function encodePublisherOpen(message: PublisherOpen) {
+function encodePublisherOpen(message) {
   return msgpack.encode([message.regexString, message.key, message.socketId, message.credentials]);
 }
 
 export class PublisherClose {
-  constructor(key:string, socketId:number) {
+  constructor(key, socketId) {
     this.key = key;
     this.socketId = socketId;
   }
-  declare key:string;
-  declare socketId:number;
+
 }
 
-function decodePublisherClose(buffer: Buffer) {
+function decodePublisherClose(buffer) {
   const decoded = msgpack.decode(buffer);
   return new PublisherClose(decoded[0], decoded[1]);
 }
 
-function encodePublisherClose(message: PublisherClose) {
+function encodePublisherClose(message) {
   return msgpack.encode([message.key, message.socketId]);
 }
 
 export class PublisherMessage {
-  constructor(key:string, message: any) {
+  constructor(key, message) {
     this.key = key;
     this.message = message;
   }
-  declare key:string;
-  declare message:any;
+
 }
 
-function decodePublisherMessage(buffer: Buffer) {
+function decodePublisherMessage(buffer) {
   const decoded = msgpack.decode(buffer);
   return new PublisherMessage(decoded[0], decoded[1]);
 }
 
-function encodePublisherMessage(message: PublisherMessage) {
+function encodePublisherMessage(message) {
   return msgpack.encode([message.key, message.message]);
 }
 
 export class PublisherPeerMessage {
-  constructor(key:string, socketId:number, message: any) {
+  constructor(key, socketId, message) {
     this.key = key;
     this.socketId = socketId;
     this.message = message;
   }
-  declare key:string;
-  declare socketId:number;
-  declare message:any;
+
 }
 
-function decodePublisherPeerMessage(buffer: Buffer) {
+function decodePublisherPeerMessage(buffer) {
   const decoded = msgpack.decode(buffer);
   return new PublisherPeerMessage(decoded[0], decoded[1], decoded[2]);
 }
 
-function encodePublisherPeerMessage(message: PublisherPeerMessage) {
+function encodePublisherPeerMessage(message) {
   return msgpack.encode([message.key, message.socketId, message.message]);
 }
 
 msgpack.register(0x1, Credentials, defaultEncode, decodeCredentials);
 msgpack.register(0x2, CredentialsResponse, defaultEncode, decodeCredentialsResponse);
-
 msgpack.register(0x3, DataDump, encodeDataDump, decodeDataDump);
 msgpack.register(0x4, ProviderDump, encodeProviderDump, decodeProviderDump);
 msgpack.register(0x5, ActiveProviderDump, encodeActiveProviderDump, decodeActiveProviderDump);
 msgpack.register(0x6, PeerDump, encodePeerDump, decodePeerDump);
 msgpack.register(0x7, PeerSubscriptionDump, encodePeerSubscriptionDump, decodePeerSubscriptionDump);
-
 msgpack.register(0x8, PeerSync, encodePeerSync, decodePeerSync);
 msgpack.register(0x9, PeerSyncResponse, defaultEncode, decodePeerSyncResponse);
-
 msgpack.register(0x10, PeerRequest, defaultEncode, decodePeerRequest);
 msgpack.register(0x11, PeerResponse, defaultEncode, decodePeerResponse);
 msgpack.register(0x12, Unpeer, encodeEmpty, decodeUnpeer);
-
 msgpack.register(0x20, SubscribeRequest, defaultEncode, decodeSubscribeRequest);
 msgpack.register(0x21, SubscribeResponse, defaultEncode, decodeSubscribeResponse);
 msgpack.register(0x22, Unsubscribe, defaultEncode, decodeUnsubscribe);
@@ -581,7 +561,6 @@ msgpack.register(0x23, EventSubscribeRequest, defaultEncode, decodeEventSubscrib
 msgpack.register(0x24, EventSubscribeResponse, defaultEncode, decodeEventSubscribeResponse);
 msgpack.register(0x25, EventUnsubscribe, defaultEncode, decodeEventUnsubscribe);
 msgpack.register(0x26, BraidEvent, encodeBraidEvent, decodeBraidEvent);
-
 msgpack.register(0x30, ReceiverDump, encodeReceiverDump, decodeReceiverDump);
 msgpack.register(0x31, PeerPublisherDump, encodePeerPublisherDump, decodePeerPublisherDump);
 msgpack.register(0x32, PublishRequest, defaultEncode, decodePublishRequest);
@@ -591,11 +570,11 @@ msgpack.register(0x35, PublisherOpen, encodePublisherOpen, decodePublisherOpen);
 msgpack.register(0x36, PublisherClose, encodePublisherClose, decodePublisherClose);
 msgpack.register(0x37, PublisherMessage, encodePublisherMessage, decodePublisherMessage);
 msgpack.register(0x38, PublisherPeerMessage, encodePublisherPeerMessage, decodePublisherPeerMessage);
-
 msgpack.register(0x40, MultipartContainer, encodeMultipartContainer, decodeMultipartContainer);
 msgpack.register(0x41, DataSyncInsertions, encodeDataSyncInsertions, decodeDataSyncInsertions);
 msgpack.register(0x42, DataSyncDeletions, encodeDataSyncDeletions, decodeDataSyncDeletions);
-
 export const encode = msgpack.encode;
 export const decode = msgpack.decode;
-export const getArrayBuffer = (b: Buffer) => b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
+export const getArrayBuffer = b => b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
+
+//# sourceMappingURL=index.esm.js.map

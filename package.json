@@ -1,11 +1,18 @@
 {
   "name": "@bunchtogether/braid-messagepack",
-  "version": "1.1.40",
-  "main": "dist/index.js",
+  "version": "1.1.45",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "exports": {
+    "require": "./dist/index.cjs.js",
+    "import": "./dist/index.esm.js"
+  },
   "repository": "https://github.com/bunchtogether/braid-messagepack.git",
   "author": "johnwehr@bunchtogether.com",
   "scripts": {
-    "build": "rm -rf ./dist; flow-remove-types ./src --out-dir ./dist && flow-copy-source ./src ./dist",
+    "build:esm": "cross-env BABEL_ENV=esm babel src/index.js --out-file dist/index.esm.js --source-maps && cp ./src/index.js ./src/index.esm.js.flow",
+    "build:cjs": "cross-env BABEL_ENV=cjs babel src/index.js --out-file dist/index.cjs.js --source-maps && cp ./src/index.js ./src/index.cjs.js.flow",
+    "build": "rm -rf ./dist && yarn build:esm && yarn build:cjs",
     "flow-typed": "./node_modules/.bin/flow-typed install --overwrite",
     "test": "yarn lint && yarn test:js",
     "test:js": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles tests",
@@ -24,6 +31,8 @@
     ]
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.14.2",
+    "@babel/cli": "^7.14.3",
     "@babel/core": "^7.14.2",
     "@babel/plugin-transform-flow-strip-types": "^7.13.0",
     "babel-eslint": "^10.1.0",
@@ -40,8 +49,6 @@
     "eslint-plugin-react": "^7.23.2",
     "expect": "^26.6.2",
     "flow-bin": "^0.125.1",
-    "flow-copy-source": "^2.0.9",
-    "flow-remove-types": "^2.151.0",
     "flow-typed": "^3.3.1",
     "husky": "^6.0.0",
     "jest": "^26.6.3",
