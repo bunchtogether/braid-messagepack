@@ -1,6 +1,6 @@
 {
   "name": "@bunchtogether/braid-messagepack",
-  "version": "1.1.45",
+  "version": "1.1.46",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "exports": {
@@ -10,8 +10,8 @@
   "repository": "https://github.com/bunchtogether/braid-messagepack.git",
   "author": "johnwehr@bunchtogether.com",
   "scripts": {
-    "build:esm": "cross-env BABEL_ENV=esm babel src/index.js --out-file dist/index.esm.js --source-maps && cp ./src/index.js ./src/index.esm.js.flow",
-    "build:cjs": "cross-env BABEL_ENV=cjs babel src/index.js --out-file dist/index.cjs.js --source-maps && cp ./src/index.js ./src/index.cjs.js.flow",
+    "build:esm": "cross-env BABEL_ENV=esm babel src/index.js --out-file dist/index.esm.js --source-maps && cp ./src/index.js ./dist/index.esm.js.flow",
+    "build:cjs": "cross-env BABEL_ENV=cjs babel src/index.js --out-file dist/index.cjs.js --source-maps && cp ./src/index.js ./dist/index.cjs.js.flow",
     "build": "rm -rf ./dist && yarn build:esm && yarn build:cjs",
     "flow-typed": "./node_modules/.bin/flow-typed install --overwrite",
     "test": "yarn lint && yarn test:js",
