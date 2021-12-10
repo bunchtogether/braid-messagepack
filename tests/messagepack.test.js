@@ -158,8 +158,8 @@ describe('Messagepack', () => {
     expect(decoded.id).toEqual(id);
   });
   test('Should encode and decode data dumps', async () => {
-    const alice = new ObservedRemoveMap();
-    const bob = new ObservedRemoveMap();
+    const alice = new ObservedRemoveMap([], { bufferPublishing: 0 });
+    const bob = new ObservedRemoveMap([], { bufferPublishing: 0 });
     const key = uuid.v4();
     const value = {
       [uuid.v4()]: uuid.v4(),
@@ -175,8 +175,8 @@ describe('Messagepack', () => {
     expect(ids).toEqual(decoded.ids);
   });
   test('Should encode and decode provider dumps', async () => {
-    const alice = new ObservedRemoveMap();
-    const bob = new ObservedRemoveMap();
+    const alice = new ObservedRemoveMap([], { bufferPublishing: 0 });
+    const bob = new ObservedRemoveMap([], { bufferPublishing: 0 });
     const key = uuid.v4();
     const value = {
       [uuid.v4()]: uuid.v4(),
@@ -192,8 +192,8 @@ describe('Messagepack', () => {
     expect(ids).toEqual(decoded.ids);
   });
   test('Should encode and decode active provider dumps', async () => {
-    const alice = new ObservedRemoveMap();
-    const bob = new ObservedRemoveMap();
+    const alice = new ObservedRemoveMap([], { bufferPublishing: 0 });
+    const bob = new ObservedRemoveMap([], { bufferPublishing: 0 });
     const key = uuid.v4();
     const value = {
       [uuid.v4()]: uuid.v4(),
@@ -209,8 +209,8 @@ describe('Messagepack', () => {
     expect(ids).toEqual(decoded.ids);
   });
   test('Should encode and decode peer dumps', async () => {
-    const alice = new ObservedRemoveMap();
-    const bob = new ObservedRemoveMap();
+    const alice = new ObservedRemoveMap([], { bufferPublishing: 0 });
+    const bob = new ObservedRemoveMap([], { bufferPublishing: 0 });
     const key = uuid.v4();
     const value = {
       [uuid.v4()]: uuid.v4(),
@@ -226,8 +226,8 @@ describe('Messagepack', () => {
     expect(ids).toEqual(decoded.ids);
   });
   test('Should encode and decode subscriber dumps', async () => {
-    const alice = new ObservedRemoveSet();
-    const bob = new ObservedRemoveSet();
+    const alice = new ObservedRemoveSet([], { bufferPublishing: 0 });
+    const bob = new ObservedRemoveSet([], { bufferPublishing: 0 });
     const key = uuid.v4();
     alice.add(key);
     const ids = [randomInteger()];
@@ -266,8 +266,8 @@ describe('Messagepack', () => {
     expect(id).toEqual(decoded.value);
   });
   test('Should encode and decode receiver dumps', async () => {
-    const alice = new ObservedRemoveMap();
-    const bob = new ObservedRemoveMap();
+    const alice = new ObservedRemoveMap([], { bufferPublishing: 0 });
+    const bob = new ObservedRemoveMap([], { bufferPublishing: 0 });
     const key = uuid.v4();
     const value = {
       [uuid.v4()]: uuid.v4(),
@@ -283,8 +283,8 @@ describe('Messagepack', () => {
     expect(ids).toEqual(decoded.ids);
   });
   test('Should encode and decode publisher dumps', async () => {
-    const alice = new ObservedRemoveSet();
-    const bob = new ObservedRemoveSet();
+    const alice = new ObservedRemoveSet([], { bufferPublishing: 0 });
+    const bob = new ObservedRemoveSet([], { bufferPublishing: 0 });
     const key = uuid.v4();
     alice.add(key);
     const ids = [randomInteger()];
@@ -390,7 +390,7 @@ describe('Messagepack', () => {
   });
   test('Should chunk and combine', async () => {
     const data = crypto.randomBytes(1024 * 1024);
-    const buffer = encode({ data });
+    const buffer = encode({ data: data.buffer });
     const chunks = MultipartContainer.chunk(buffer, Math.round(Math.random() * 1024 * 1024));
     expect(chunks.reduce((acc, chunk) => acc + decode(chunk).buffer.length, 0)).toEqual(buffer.length);
     const mergeChunksPromise = MultipartContainer.getMergeChunksPromise(1000);
@@ -399,7 +399,8 @@ describe('Messagepack', () => {
     }
     const mergedChunksBuffer = await mergeChunksPromise;
     expect(buffer.equals(mergedChunksBuffer)).toEqual(true);
-    expect(decode(mergedChunksBuffer).data).toEqual(data);
+    const x = decode(mergedChunksBuffer);
+    expect(x.data).toEqual(data);
   });
   test('Should encode and decode data sync insertions', async () => {
     const insertions = [

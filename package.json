@@ -1,6 +1,6 @@
 {
   "name": "@bunchtogether/braid-messagepack",
-  "version": "1.1.46",
+  "version": "1.2.0",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "exports": {
@@ -23,6 +23,7 @@
     "prepare": "husky install"
   },
   "jest": {
+    "testEnvironment":"node",
     "coverageDirectory": "./coverage/",
     "collectCoverage": true,
     "collectCoverageFrom": [
@@ -31,10 +32,10 @@
     ]
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.14.2",
     "@babel/cli": "^7.14.3",
     "@babel/core": "^7.14.2",
     "@babel/plugin-transform-flow-strip-types": "^7.13.0",
+    "@babel/preset-env": "^7.14.2",
     "babel-eslint": "^10.1.0",
     "codecov": "^3.8.2",
     "cross-env": "^7.0.3",
@@ -58,6 +59,6 @@
     "uuid": "^8.3.2"
   },
   "dependencies": {
-    "msgpack5": "^5.3.2"
+    "msgpackr": "^1.5.1"
   }
 }

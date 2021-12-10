@@ -1,15 +1,19 @@
 "use strict";
 
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+Object.defineProperty(exports, "isNativeAccelerationEnabled", {
+  enumerable: true,
+  get: function get() {
+    return _msgpackr.isNativeAccelerationEnabled;
+  }
+});
 exports.getArrayBuffer = exports.decode = exports.encode = exports.PublisherPeerMessage = exports.PublisherMessage = exports.PublisherClose = exports.PublisherOpen = exports.Unpublish = exports.PublishResponse = exports.PublishRequest = exports.PeerPublisherDump = exports.ReceiverDump = exports.BraidEvent = exports.EventUnsubscribe = exports.EventSubscribeResponse = exports.EventSubscribeRequest = exports.Unsubscribe = exports.SubscribeResponse = exports.SubscribeRequest = exports.Unpeer = exports.PeerResponse = exports.PeerRequest = exports.PeerSubscriptionDump = exports.ActiveProviderDump = exports.ProviderDump = exports.PeerDump = exports.DataSyncDeletions = exports.DataSyncInsertions = exports.DataDump = exports.MultipartContainer = exports.MergeChunksPromise = exports.PeerSyncResponse = exports.PeerSync = exports.CredentialsResponse = exports.Credentials = void 0;
 
-var _msgpack = _interopRequireDefault(require("msgpack5"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+var _msgpackr = require("msgpackr");
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -45,14 +49,12 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var msgpack = (0, _msgpack["default"])();
-
 function defaultEncode(o) {
-  return msgpack.encode(o.value);
+  return o.value;
 }
 
 function encodeEmpty() {
-  return Buffer.from([]);
+  return [];
 }
 
 var Credentials = function Credentials(value) {
@@ -63,8 +65,7 @@ var Credentials = function Credentials(value) {
 
 exports.Credentials = Credentials;
 
-function decodeCredentials(buffer) {
-  var value = msgpack.decode(buffer);
+function decodeCredentials(value) {
   return new Credentials(value);
 }
 
@@ -76,8 +77,7 @@ var CredentialsResponse = function CredentialsResponse(value) {
 
 exports.CredentialsResponse = CredentialsResponse;
 
-function decodeCredentialsResponse(buffer) {
-  var value = msgpack.decode(buffer);
+function decodeCredentialsResponse(value) {
   return new CredentialsResponse(value);
 }
 
@@ -94,13 +94,12 @@ var PeerSync = function PeerSync(id, peers, providers, receivers, activeProvider
 
 exports.PeerSync = PeerSync;
 
-function decodePeerSync(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodePeerSync(decoded) {
   return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5]);
 }
 
 function encodePeerSync(peerSync) {
-  return msgpack.encode([peerSync.id, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions]);
+  return [peerSync.id, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions];
 }
 
 var PeerSyncResponse = function PeerSyncResponse(value) {
@@ -111,8 +110,7 @@ var PeerSyncResponse = function PeerSyncResponse(value) {
 
 exports.PeerSyncResponse = PeerSyncResponse;
 
-function decodePeerSyncResponse(buffer) {
-  var value = msgpack.decode(buffer);
+function decodePeerSyncResponse(value) {
   return new PeerSyncResponse(value);
 }
 
@@ -218,7 +216,7 @@ _defineProperty(MultipartContainer, "chunk", function (buffer, size) {
 
   for (var i = 0; i * size < buffer.length; i += 1) {
     var slice = buffer.slice(i * size, (i + 1) * size);
-    chunks.push(msgpack.encode(new MultipartContainer(incrementedChunkId, i * size, buffer.length, slice)));
+    chunks.push((0, _msgpackr.pack)(new MultipartContainer(incrementedChunkId, i * size, buffer.length, slice)));
   }
 
   incrementedChunkId += 1;
@@ -235,12 +233,19 @@ _defineProperty(MultipartContainer, "getMergeChunksPromise", function (timeoutDu
 });
 
 function decodeMultipartContainer(buffer) {
-  var decoded = msgpack.decode(buffer);
-  return new MultipartContainer(decoded[0], decoded[1], decoded[2], decoded[3]);
+  var id = buffer.readUInt32BE(0);
+  var position = buffer.readUInt32BE(4);
+  var length = buffer.readUInt32BE(8);
+  return new MultipartContainer(id, position, length, buffer.slice(12));
 }
 
 function encodeMultipartContainer(multipartContainer) {
-  return msgpack.encode([multipartContainer.id, multipartContainer.position, multipartContainer.length, multipartContainer.buffer]);
+  var buffer = Buffer.allocUnsafe(multipartContainer.buffer.length + 12);
+  buffer.writeUInt32BE(multipartContainer.id, 0);
+  buffer.writeUInt32BE(multipartContainer.position, 4);
+  buffer.writeUInt32BE(multipartContainer.length, 8);
+  multipartContainer.buffer.copy(buffer, 12);
+  return buffer;
 }
 
 var DataDump = function DataDump(queue) {
@@ -254,13 +259,12 @@ var DataDump = function DataDump(queue) {
 
 exports.DataDump = DataDump;
 
-function decodeDataDump(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodeDataDump(decoded) {
   return new DataDump(decoded[0], decoded[1]);
 }
 
 function encodeDataDump(dump) {
-  return msgpack.encode([dump.queue, dump.ids]);
+  return [dump.queue, dump.ids];
 }
 
 var DataSyncInsertions = function DataSyncInsertions(insertions) {
@@ -271,13 +275,12 @@ var DataSyncInsertions = function DataSyncInsertions(insertions) {
 
 exports.DataSyncInsertions = DataSyncInsertions;
 
-function decodeDataSyncInsertions(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodeDataSyncInsertions(decoded) {
   return new DataSyncInsertions(decoded);
 }
 
 function encodeDataSyncInsertions(dataSync) {
-  return msgpack.encode(dataSync.insertions);
+  return dataSync.insertions;
 }
 
 var DataSyncDeletions = function DataSyncDeletions(deletions) {
@@ -288,13 +291,12 @@ var DataSyncDeletions = function DataSyncDeletions(deletions) {
 
 exports.DataSyncDeletions = DataSyncDeletions;
 
-function decodeDataSyncDeletions(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodeDataSyncDeletions(decoded) {
   return new DataSyncDeletions(decoded);
 }
 
 function encodeDataSyncDeletions(dataSync) {
-  return msgpack.encode(dataSync.deletions);
+  return dataSync.deletions;
 }
 
 var PeerDump = function PeerDump(queue) {
@@ -308,13 +310,12 @@ var PeerDump = function PeerDump(queue) {
 
 exports.PeerDump = PeerDump;
 
-function decodePeerDump(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodePeerDump(decoded) {
   return new PeerDump(decoded[0], decoded[1]);
 }
 
 function encodePeerDump(dump) {
-  return msgpack.encode([dump.queue, dump.ids]);
+  return [dump.queue, dump.ids];
 }
 
 var ProviderDump = function ProviderDump(queue) {
@@ -328,13 +329,12 @@ var ProviderDump = function ProviderDump(queue) {
 
 exports.ProviderDump = ProviderDump;
 
-function decodeProviderDump(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodeProviderDump(decoded) {
   return new ProviderDump(decoded[0], decoded[1]);
 }
 
 function encodeProviderDump(dump) {
-  return msgpack.encode([dump.queue, dump.ids]);
+  return [dump.queue, dump.ids];
 }
 
 var ActiveProviderDump = function ActiveProviderDump(queue) {
@@ -348,13 +348,12 @@ var ActiveProviderDump = function ActiveProviderDump(queue) {
 
 exports.ActiveProviderDump = ActiveProviderDump;
 
-function decodeActiveProviderDump(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodeActiveProviderDump(decoded) {
   return new ActiveProviderDump(decoded[0], decoded[1]);
 }
 
 function encodeActiveProviderDump(dump) {
-  return msgpack.encode([dump.queue, dump.ids]);
+  return [dump.queue, dump.ids];
 }
 
 var PeerSubscriptionDump = function PeerSubscriptionDump(queue) {
@@ -368,13 +367,12 @@ var PeerSubscriptionDump = function PeerSubscriptionDump(queue) {
 
 exports.PeerSubscriptionDump = PeerSubscriptionDump;
 
-function decodePeerSubscriptionDump(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodePeerSubscriptionDump(decoded) {
   return new PeerSubscriptionDump(decoded[0], decoded[1]);
 }
 
 function encodePeerSubscriptionDump(dump) {
-  return msgpack.encode([dump.queue, dump.ids]);
+  return [dump.queue, dump.ids];
 }
 
 var PeerRequest = function PeerRequest(value) {
@@ -385,8 +383,7 @@ var PeerRequest = function PeerRequest(value) {
 
 exports.PeerRequest = PeerRequest;
 
-function decodePeerRequest(buffer) {
-  var value = msgpack.decode(buffer);
+function decodePeerRequest(value) {
   return new PeerRequest(value);
 }
 
@@ -398,8 +395,7 @@ var PeerResponse = function PeerResponse(value) {
 
 exports.PeerResponse = PeerResponse;
 
-function decodePeerResponse(buffer) {
-  var value = msgpack.decode(buffer);
+function decodePeerResponse(value) {
   return new PeerResponse(value);
 }
 
@@ -421,8 +417,7 @@ var SubscribeRequest = function SubscribeRequest(value) {
 
 exports.SubscribeRequest = SubscribeRequest;
 
-function decodeSubscribeRequest(buffer) {
-  var value = msgpack.decode(buffer);
+function decodeSubscribeRequest(value) {
   return new SubscribeRequest(value);
 }
 
@@ -434,8 +429,7 @@ var SubscribeResponse = function SubscribeResponse(value) {
 
 exports.SubscribeResponse = SubscribeResponse;
 
-function decodeSubscribeResponse(buffer) {
-  var value = msgpack.decode(buffer);
+function decodeSubscribeResponse(value) {
   return new SubscribeResponse(value);
 }
 
@@ -447,8 +441,7 @@ var Unsubscribe = function Unsubscribe(value) {
 
 exports.Unsubscribe = Unsubscribe;
 
-function decodeUnsubscribe(buffer) {
-  var value = msgpack.decode(buffer);
+function decodeUnsubscribe(value) {
   return new Unsubscribe(value);
 }
 
@@ -460,8 +453,7 @@ var EventSubscribeRequest = function EventSubscribeRequest(value) {
 
 exports.EventSubscribeRequest = EventSubscribeRequest;
 
-function decodeEventSubscribeRequest(buffer) {
-  var value = msgpack.decode(buffer);
+function decodeEventSubscribeRequest(value) {
   return new EventSubscribeRequest(value);
 }
 
@@ -473,8 +465,7 @@ var EventSubscribeResponse = function EventSubscribeResponse(value) {
 
 exports.EventSubscribeResponse = EventSubscribeResponse;
 
-function decodeEventSubscribeResponse(buffer) {
-  var value = msgpack.decode(buffer);
+function decodeEventSubscribeResponse(value) {
   return new EventSubscribeResponse(value);
 }
 
@@ -486,8 +477,7 @@ var EventUnsubscribe = function EventUnsubscribe(value) {
 
 exports.EventUnsubscribe = EventUnsubscribe;
 
-function decodeEventUnsubscribe(buffer) {
-  var value = msgpack.decode(buffer);
+function decodeEventUnsubscribe(value) {
   return new EventUnsubscribe(value);
 }
 
@@ -504,13 +494,12 @@ var BraidEvent = function BraidEvent(name, args, id) {
 
 exports.BraidEvent = BraidEvent;
 
-function decodeBraidEvent(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodeBraidEvent(decoded) {
   return new BraidEvent(decoded[0], decoded[1], decoded[2], decoded[3]);
 }
 
 function encodeBraidEvent(event) {
-  return msgpack.encode([event.name, event.args, event.id, event.ids]);
+  return [event.name, event.args, event.id, event.ids];
 }
 
 var ReceiverDump = function ReceiverDump(queue) {
@@ -524,13 +513,12 @@ var ReceiverDump = function ReceiverDump(queue) {
 
 exports.ReceiverDump = ReceiverDump;
 
-function decodeReceiverDump(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodeReceiverDump(decoded) {
   return new ReceiverDump(decoded[0], decoded[1]);
 }
 
 function encodeReceiverDump(dump) {
-  return msgpack.encode([dump.queue, dump.ids]);
+  return [dump.queue, dump.ids];
 }
 
 var PeerPublisherDump = function PeerPublisherDump(queue) {
@@ -544,13 +532,12 @@ var PeerPublisherDump = function PeerPublisherDump(queue) {
 
 exports.PeerPublisherDump = PeerPublisherDump;
 
-function decodePeerPublisherDump(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodePeerPublisherDump(decoded) {
   return new PeerPublisherDump(decoded[0], decoded[1]);
 }
 
 function encodePeerPublisherDump(dump) {
-  return msgpack.encode([dump.queue, dump.ids]);
+  return [dump.queue, dump.ids];
 }
 
 var PublishRequest = function PublishRequest(value) {
@@ -561,8 +548,7 @@ var PublishRequest = function PublishRequest(value) {
 
 exports.PublishRequest = PublishRequest;
 
-function decodePublishRequest(buffer) {
-  var value = msgpack.decode(buffer);
+function decodePublishRequest(value) {
   return new PublishRequest(value);
 }
 
@@ -574,8 +560,7 @@ var PublishResponse = function PublishResponse(value) {
 
 exports.PublishResponse = PublishResponse;
 
-function decodePublishResponse(buffer) {
-  var value = msgpack.decode(buffer);
+function decodePublishResponse(value) {
   return new PublishResponse(value);
 }
 
@@ -587,8 +572,7 @@ var Unpublish = function Unpublish(value) {
 
 exports.Unpublish = Unpublish;
 
-function decodeUnpublish(buffer) {
-  var value = msgpack.decode(buffer);
+function decodeUnpublish(value) {
   return new Unpublish(value);
 }
 
@@ -603,13 +587,12 @@ var PublisherOpen = function PublisherOpen(regexString, key, socketId, credentia
 
 exports.PublisherOpen = PublisherOpen;
 
-function decodePublisherOpen(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodePublisherOpen(decoded) {
   return new PublisherOpen(decoded[0], decoded[1], decoded[2], decoded[3]);
 }
 
 function encodePublisherOpen(message) {
-  return msgpack.encode([message.regexString, message.key, message.socketId, message.credentials]);
+  return [message.regexString, message.key, message.socketId, message.credentials];
 }
 
 var PublisherClose = function PublisherClose(key, socketId) {
@@ -621,13 +604,12 @@ var PublisherClose = function PublisherClose(key, socketId) {
 
 exports.PublisherClose = PublisherClose;
 
-function decodePublisherClose(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodePublisherClose(decoded) {
   return new PublisherClose(decoded[0], decoded[1]);
 }
 
 function encodePublisherClose(message) {
-  return msgpack.encode([message.key, message.socketId]);
+  return [message.key, message.socketId];
 }
 
 var PublisherMessage = function PublisherMessage(key, message) {
@@ -639,13 +621,12 @@ var PublisherMessage = function PublisherMessage(key, message) {
 
 exports.PublisherMessage = PublisherMessage;
 
-function decodePublisherMessage(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodePublisherMessage(decoded) {
   return new PublisherMessage(decoded[0], decoded[1]);
 }
 
 function encodePublisherMessage(message) {
-  return msgpack.encode([message.key, message.message]);
+  return [message.key, message.message];
 }
 
 var PublisherPeerMessage = function PublisherPeerMessage(key, socketId, message) {
@@ -658,49 +639,203 @@ var PublisherPeerMessage = function PublisherPeerMessage(key, socketId, message)
 
 exports.PublisherPeerMessage = PublisherPeerMessage;
 
-function decodePublisherPeerMessage(buffer) {
-  var decoded = msgpack.decode(buffer);
+function decodePublisherPeerMessage(decoded) {
   return new PublisherPeerMessage(decoded[0], decoded[1], decoded[2]);
 }
 
 function encodePublisherPeerMessage(message) {
-  return msgpack.encode([message.key, message.socketId, message.message]);
+  return [message.key, message.socketId, message.message];
 }
 
-msgpack.register(0x1, Credentials, defaultEncode, decodeCredentials);
-msgpack.register(0x2, CredentialsResponse, defaultEncode, decodeCredentialsResponse);
-msgpack.register(0x3, DataDump, encodeDataDump, decodeDataDump);
-msgpack.register(0x4, ProviderDump, encodeProviderDump, decodeProviderDump);
-msgpack.register(0x5, ActiveProviderDump, encodeActiveProviderDump, decodeActiveProviderDump);
-msgpack.register(0x6, PeerDump, encodePeerDump, decodePeerDump);
-msgpack.register(0x7, PeerSubscriptionDump, encodePeerSubscriptionDump, decodePeerSubscriptionDump);
-msgpack.register(0x8, PeerSync, encodePeerSync, decodePeerSync);
-msgpack.register(0x9, PeerSyncResponse, defaultEncode, decodePeerSyncResponse);
-msgpack.register(0x10, PeerRequest, defaultEncode, decodePeerRequest);
-msgpack.register(0x11, PeerResponse, defaultEncode, decodePeerResponse);
-msgpack.register(0x12, Unpeer, encodeEmpty, decodeUnpeer);
-msgpack.register(0x20, SubscribeRequest, defaultEncode, decodeSubscribeRequest);
-msgpack.register(0x21, SubscribeResponse, defaultEncode, decodeSubscribeResponse);
-msgpack.register(0x22, Unsubscribe, defaultEncode, decodeUnsubscribe);
-msgpack.register(0x23, EventSubscribeRequest, defaultEncode, decodeEventSubscribeRequest);
-msgpack.register(0x24, EventSubscribeResponse, defaultEncode, decodeEventSubscribeResponse);
-msgpack.register(0x25, EventUnsubscribe, defaultEncode, decodeEventUnsubscribe);
-msgpack.register(0x26, BraidEvent, encodeBraidEvent, decodeBraidEvent);
-msgpack.register(0x30, ReceiverDump, encodeReceiverDump, decodeReceiverDump);
-msgpack.register(0x31, PeerPublisherDump, encodePeerPublisherDump, decodePeerPublisherDump);
-msgpack.register(0x32, PublishRequest, defaultEncode, decodePublishRequest);
-msgpack.register(0x33, PublishResponse, defaultEncode, decodePublishResponse);
-msgpack.register(0x34, Unpublish, defaultEncode, decodeUnpublish);
-msgpack.register(0x35, PublisherOpen, encodePublisherOpen, decodePublisherOpen);
-msgpack.register(0x36, PublisherClose, encodePublisherClose, decodePublisherClose);
-msgpack.register(0x37, PublisherMessage, encodePublisherMessage, decodePublisherMessage);
-msgpack.register(0x38, PublisherPeerMessage, encodePublisherPeerMessage, decodePublisherPeerMessage);
-msgpack.register(0x40, MultipartContainer, encodeMultipartContainer, decodeMultipartContainer);
-msgpack.register(0x41, DataSyncInsertions, encodeDataSyncInsertions, decodeDataSyncInsertions);
-msgpack.register(0x42, DataSyncDeletions, encodeDataSyncDeletions, decodeDataSyncDeletions);
-var encode = msgpack.encode;
+(0, _msgpackr.addExtension)({
+  Class: Credentials,
+  type: 0x1,
+  write: defaultEncode,
+  read: decodeCredentials
+});
+(0, _msgpackr.addExtension)({
+  Class: CredentialsResponse,
+  type: 0x2,
+  write: defaultEncode,
+  read: decodeCredentialsResponse
+});
+(0, _msgpackr.addExtension)({
+  Class: DataDump,
+  type: 0x3,
+  write: encodeDataDump,
+  read: decodeDataDump
+});
+(0, _msgpackr.addExtension)({
+  Class: ProviderDump,
+  type: 0x4,
+  write: encodeProviderDump,
+  read: decodeProviderDump
+});
+(0, _msgpackr.addExtension)({
+  Class: ActiveProviderDump,
+  type: 0x5,
+  write: encodeActiveProviderDump,
+  read: decodeActiveProviderDump
+});
+(0, _msgpackr.addExtension)({
+  Class: PeerDump,
+  type: 0x6,
+  write: encodePeerDump,
+  read: decodePeerDump
+});
+(0, _msgpackr.addExtension)({
+  Class: PeerSubscriptionDump,
+  type: 0x7,
+  write: encodePeerSubscriptionDump,
+  read: decodePeerSubscriptionDump
+});
+(0, _msgpackr.addExtension)({
+  Class: PeerSync,
+  type: 0x8,
+  write: encodePeerSync,
+  read: decodePeerSync
+});
+(0, _msgpackr.addExtension)({
+  Class: PeerSyncResponse,
+  type: 0x9,
+  write: defaultEncode,
+  read: decodePeerSyncResponse
+});
+(0, _msgpackr.addExtension)({
+  Class: PeerRequest,
+  type: 0x10,
+  write: defaultEncode,
+  read: decodePeerRequest
+});
+(0, _msgpackr.addExtension)({
+  Class: PeerResponse,
+  type: 0x11,
+  write: defaultEncode,
+  read: decodePeerResponse
+});
+(0, _msgpackr.addExtension)({
+  Class: Unpeer,
+  type: 0x12,
+  write: encodeEmpty,
+  read: decodeUnpeer
+});
+(0, _msgpackr.addExtension)({
+  Class: SubscribeRequest,
+  type: 0x20,
+  write: defaultEncode,
+  read: decodeSubscribeRequest
+});
+(0, _msgpackr.addExtension)({
+  Class: SubscribeResponse,
+  type: 0x21,
+  write: defaultEncode,
+  read: decodeSubscribeResponse
+});
+(0, _msgpackr.addExtension)({
+  Class: Unsubscribe,
+  type: 0x22,
+  write: defaultEncode,
+  read: decodeUnsubscribe
+});
+(0, _msgpackr.addExtension)({
+  Class: EventSubscribeRequest,
+  type: 0x23,
+  write: defaultEncode,
+  read: decodeEventSubscribeRequest
+});
+(0, _msgpackr.addExtension)({
+  Class: EventSubscribeResponse,
+  type: 0x24,
+  write: defaultEncode,
+  read: decodeEventSubscribeResponse
+});
+(0, _msgpackr.addExtension)({
+  Class: EventUnsubscribe,
+  type: 0x25,
+  write: defaultEncode,
+  read: decodeEventUnsubscribe
+});
+(0, _msgpackr.addExtension)({
+  Class: BraidEvent,
+  type: 0x26,
+  write: encodeBraidEvent,
+  read: decodeBraidEvent
+});
+(0, _msgpackr.addExtension)({
+  Class: ReceiverDump,
+  type: 0x30,
+  write: encodeReceiverDump,
+  read: decodeReceiverDump
+});
+(0, _msgpackr.addExtension)({
+  Class: PeerPublisherDump,
+  type: 0x31,
+  write: encodePeerPublisherDump,
+  read: decodePeerPublisherDump
+});
+(0, _msgpackr.addExtension)({
+  Class: PublishRequest,
+  type: 0x32,
+  write: defaultEncode,
+  read: decodePublishRequest
+});
+(0, _msgpackr.addExtension)({
+  Class: PublishResponse,
+  type: 0x33,
+  write: defaultEncode,
+  read: decodePublishResponse
+});
+(0, _msgpackr.addExtension)({
+  Class: Unpublish,
+  type: 0x34,
+  write: defaultEncode,
+  read: decodeUnpublish
+});
+(0, _msgpackr.addExtension)({
+  Class: PublisherOpen,
+  type: 0x35,
+  write: encodePublisherOpen,
+  read: decodePublisherOpen
+});
+(0, _msgpackr.addExtension)({
+  Class: PublisherClose,
+  type: 0x36,
+  write: encodePublisherClose,
+  read: decodePublisherClose
+});
+(0, _msgpackr.addExtension)({
+  Class: PublisherMessage,
+  type: 0x37,
+  write: encodePublisherMessage,
+  read: decodePublisherMessage
+});
+(0, _msgpackr.addExtension)({
+  Class: PublisherPeerMessage,
+  type: 0x38,
+  write: encodePublisherPeerMessage,
+  read: decodePublisherPeerMessage
+});
+(0, _msgpackr.addExtension)({
+  Class: MultipartContainer,
+  type: 0x40,
+  pack: encodeMultipartContainer,
+  unpack: decodeMultipartContainer
+});
+(0, _msgpackr.addExtension)({
+  Class: DataSyncInsertions,
+  type: 0x41,
+  write: encodeDataSyncInsertions,
+  read: decodeDataSyncInsertions
+});
+(0, _msgpackr.addExtension)({
+  Class: DataSyncDeletions,
+  type: 0x42,
+  write: encodeDataSyncDeletions,
+  read: decodeDataSyncDeletions
+});
+var encode = _msgpackr.pack;
 exports.encode = encode;
-var decode = msgpack.decode;
+var decode = _msgpackr.unpack;
 exports.decode = decode;
 
 var getArrayBuffer = function getArrayBuffer(b) {
