@@ -1,6 +1,6 @@
 {
   "name": "@bunchtogether/braid-messagepack",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "exports": {
@@ -36,6 +36,7 @@
     "@babel/core": "^7.16.0",
     "@babel/plugin-transform-flow-strip-types": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
+    "@babel/eslint-parser": "^7.16.3",
     "codecov": "^3.8.2",
     "cross-env": "^7.0.3",
     "documentation": "^13.2.5",
@@ -58,7 +59,6 @@
     "uuid": "^8.3.2"
   },
   "dependencies": {
-    "@babel/eslint-parser": "^7.16.3",
     "msgpackr": "^1.5.1"
   }
 }
