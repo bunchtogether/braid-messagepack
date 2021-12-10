@@ -1,6 +1,6 @@
 {
   "name": "@bunchtogether/braid-messagepack",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "exports": {
@@ -23,7 +23,7 @@
     "prepare": "husky install"
   },
   "jest": {
-    "testEnvironment":"node",
+    "testEnvironment": "node",
     "coverageDirectory": "./coverage/",
     "collectCoverage": true,
     "collectCoverageFrom": [
@@ -32,33 +32,33 @@
     ]
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.3",
-    "@babel/core": "^7.14.2",
-    "@babel/plugin-transform-flow-strip-types": "^7.13.0",
-    "@babel/preset-env": "^7.14.2",
-    "babel-eslint": "^10.1.0",
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
+    "@babel/plugin-transform-flow-strip-types": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
     "codecov": "^3.8.2",
     "cross-env": "^7.0.3",
     "documentation": "^13.2.5",
-    "eslint": "^7.26.0",
+    "eslint": "^8.4.1",
     "eslint-config-bunchtogether": "^1.1.6",
-    "eslint-plugin-flowtype": "^5.7.2",
-    "eslint-plugin-flowtype-errors": "^4.4.0",
-    "eslint-plugin-import": "^2.23.0",
-    "eslint-plugin-jest": "^24.3.6",
-    "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-react": "^7.23.2",
-    "expect": "^26.6.2",
-    "flow-bin": "^0.125.1",
-    "flow-typed": "^3.3.1",
-    "husky": "^6.0.0",
-    "jest": "^26.6.3",
-    "jest-diff": "^26.6.2",
+    "eslint-plugin-flowtype": "^8.0.3",
+    "eslint-plugin-flowtype-errors": "^4.5.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jest": "^25.3.0",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.27.1",
+    "expect": "^27.4.2",
+    "flow-bin": "^0.166.1",
+    "flow-typed": "^3.5.0",
+    "husky": "^7.0.4",
+    "jest": "^27.4.3",
+    "jest-diff": "^27.4.2",
     "observed-remove": "^2.2.27",
     "pre-commit": "^1.2.2",
     "uuid": "^8.3.2"
   },
   "dependencies": {
+    "@babel/eslint-parser": "^7.16.3",
     "msgpackr": "^1.5.1"
   }
 }

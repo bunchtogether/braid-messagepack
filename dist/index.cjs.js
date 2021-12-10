@@ -5,13 +5,13 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.encode = exports.decode = exports.Unsubscribe = exports.Unpublish = exports.Unpeer = exports.SubscribeResponse = exports.SubscribeRequest = exports.ReceiverDump = exports.PublisherPeerMessage = exports.PublisherOpen = exports.PublisherMessage = exports.PublisherClose = exports.PublishResponse = exports.PublishRequest = exports.ProviderDump = exports.PeerSyncResponse = exports.PeerSync = exports.PeerSubscriptionDump = exports.PeerResponse = exports.PeerRequest = exports.PeerPublisherDump = exports.PeerDump = exports.MultipartContainer = exports.MergeChunksPromise = exports.EventUnsubscribe = exports.EventSubscribeResponse = exports.EventSubscribeRequest = exports.DataSyncInsertions = exports.DataSyncDeletions = exports.DataDump = exports.CredentialsResponse = exports.Credentials = exports.BraidEvent = exports.ActiveProviderDump = void 0;
 Object.defineProperty(exports, "isNativeAccelerationEnabled", {
   enumerable: true,
   get: function get() {
     return _msgpackr.isNativeAccelerationEnabled;
   }
 });
-exports.getArrayBuffer = exports.decode = exports.encode = exports.PublisherPeerMessage = exports.PublisherMessage = exports.PublisherClose = exports.PublisherOpen = exports.Unpublish = exports.PublishResponse = exports.PublishRequest = exports.PeerPublisherDump = exports.ReceiverDump = exports.BraidEvent = exports.EventUnsubscribe = exports.EventSubscribeResponse = exports.EventSubscribeRequest = exports.Unsubscribe = exports.SubscribeResponse = exports.SubscribeRequest = exports.Unpeer = exports.PeerResponse = exports.PeerRequest = exports.PeerSubscriptionDump = exports.ActiveProviderDump = exports.ProviderDump = exports.PeerDump = exports.DataSyncDeletions = exports.DataSyncInsertions = exports.DataDump = exports.MultipartContainer = exports.MergeChunksPromise = exports.PeerSyncResponse = exports.PeerSync = exports.CredentialsResponse = exports.Credentials = void 0;
 
 var _msgpackr = require("msgpackr");
 
@@ -31,7 +31,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
@@ -116,7 +116,7 @@ function decodePeerSyncResponse(value) {
 
 var incrementedChunkId = Math.random() * 4294967296 >>> 0;
 
-var MergeChunksPromise = /*#__PURE__*/function (_Promise) {
+var MergeChunksPromise = /*#__PURE__*/function (_Promise, _Symbol$species, _Symbol$toStringTag) {
   _inherits(MergeChunksPromise, _Promise);
 
   var _super = _createSuper(MergeChunksPromise);
@@ -183,20 +183,20 @@ var MergeChunksPromise = /*#__PURE__*/function (_Promise) {
     } // $FlowFixMe
 
   }, {
-    key: Symbol.toStringTag,
+    key: _Symbol$toStringTag,
     get: // $FlowFixMe
     function get() {
       return 'MergeChunksPromise';
     }
   }], [{
-    key: Symbol.species,
+    key: _Symbol$species,
     get: function get() {
       return Promise;
     }
   }]);
 
   return MergeChunksPromise;
-}( /*#__PURE__*/_wrapNativeSuper(Promise));
+}( /*#__PURE__*/_wrapNativeSuper(Promise), Symbol.species, Symbol.toStringTag);
 
 exports.MergeChunksPromise = MergeChunksPromise;
 
@@ -211,7 +211,11 @@ var MultipartContainer = function MultipartContainer(id, position, length, buffe
 
 exports.MultipartContainer = MultipartContainer;
 
-_defineProperty(MultipartContainer, "chunk", function (buffer, size) {
+_defineProperty(MultipartContainer, "chunk", void 0);
+
+_defineProperty(MultipartContainer, "getMergeChunksPromise", void 0);
+
+MultipartContainer.chunk = function (buffer, size) {
   var chunks = [];
 
   for (var i = 0; i * size < buffer.length; i += 1) {
@@ -226,11 +230,11 @@ _defineProperty(MultipartContainer, "chunk", function (buffer, size) {
   }
 
   return chunks;
-});
+};
 
-_defineProperty(MultipartContainer, "getMergeChunksPromise", function (timeoutDuration) {
+MultipartContainer.getMergeChunksPromise = function (timeoutDuration) {
   return new MergeChunksPromise(timeoutDuration);
-});
+};
 
 function decodeMultipartContainer(buffer) {
   var id = buffer.readUInt32BE(0);
@@ -837,11 +841,5 @@ var encode = _msgpackr.pack;
 exports.encode = encode;
 var decode = _msgpackr.unpack;
 exports.decode = decode;
-
-var getArrayBuffer = function getArrayBuffer(b) {
-  return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
-};
-
-exports.getArrayBuffer = getArrayBuffer;
 
 //# sourceMappingURL=index.cjs.js.map

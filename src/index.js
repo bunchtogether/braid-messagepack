@@ -1,10 +1,10 @@
 // @flow
 
-import { 
-  addExtension, 
-  pack, 
-  unpack, 
-  isNativeAccelerationEnabled
+import {
+  addExtension,
+  pack,
+  unpack,
+  isNativeAccelerationEnabled,
 } from 'msgpackr';
 
 function defaultEncode(o: {value: any}) {
@@ -126,19 +126,9 @@ export class MergeChunksPromise extends Promise<Buffer> {
 }
 
 export class MultipartContainer {
-  static chunk = (buffer:Buffer, size:number) => {
-    const chunks = [];
-    for (let i = 0; i * size < buffer.length; i += 1) {
-      const slice = buffer.slice(i * size, (i + 1) * size);
-      chunks.push(pack(new MultipartContainer(incrementedChunkId, i * size, buffer.length, slice)));
-    }
-    incrementedChunkId += 1;
-    if (incrementedChunkId > 4294967294) {
-      incrementedChunkId = 0;
-    }
-    return chunks;
-  }
-  static getMergeChunksPromise = (timeoutDuration: number) => new MergeChunksPromise(timeoutDuration)
+  static chunk: (Buffer, number) => Array<Buffer>;
+  static getMergeChunksPromise: (number) => MergeChunksPromise;
+
   constructor(id:number, position:number, length: number, buffer:Buffer) {
     this.id = id;
     this.position = position;
@@ -150,6 +140,21 @@ export class MultipartContainer {
   declare length:number;
   declare buffer:Buffer;
 }
+
+MultipartContainer.chunk = (buffer:Buffer, size:number) => {
+  const chunks = [];
+  for (let i = 0; i * size < buffer.length; i += 1) {
+    const slice = buffer.slice(i * size, (i + 1) * size);
+    chunks.push(pack(new MultipartContainer(incrementedChunkId, i * size, buffer.length, slice)));
+  }
+  incrementedChunkId += 1;
+  if (incrementedChunkId > 4294967294) {
+    incrementedChunkId = 0;
+  }
+  return chunks;
+};
+
+MultipartContainer.getMergeChunksPromise = (timeoutDuration: number) => new MergeChunksPromise(timeoutDuration);
 
 function decodeMultipartContainer(buffer: Buffer) {
   const id = buffer.readUInt32BE(0);
@@ -729,4 +734,4 @@ addExtension({
 export { isNativeAccelerationEnabled };
 export const encode = pack;
 export const decode = unpack;
-export const getArrayBuffer = (b: Buffer) => b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
+

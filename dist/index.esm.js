@@ -130,7 +130,11 @@ export class MultipartContainer {
 
 }
 
-_defineProperty(MultipartContainer, "chunk", (buffer, size) => {
+_defineProperty(MultipartContainer, "chunk", void 0);
+
+_defineProperty(MultipartContainer, "getMergeChunksPromise", void 0);
+
+MultipartContainer.chunk = (buffer, size) => {
   const chunks = [];
 
   for (let i = 0; i * size < buffer.length; i += 1) {
@@ -145,9 +149,9 @@ _defineProperty(MultipartContainer, "chunk", (buffer, size) => {
   }
 
   return chunks;
-});
+};
 
-_defineProperty(MultipartContainer, "getMergeChunksPromise", timeoutDuration => new MergeChunksPromise(timeoutDuration));
+MultipartContainer.getMergeChunksPromise = timeoutDuration => new MergeChunksPromise(timeoutDuration);
 
 function decodeMultipartContainer(buffer) {
   const id = buffer.readUInt32BE(0);
@@ -708,6 +712,5 @@ addExtension({
 export { isNativeAccelerationEnabled };
 export const encode = pack;
 export const decode = unpack;
-export const getArrayBuffer = b => b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
 
 //# sourceMappingURL=index.esm.js.map
