@@ -33,23 +33,24 @@ function decodeCredentialsResponse(value) {
 }
 
 export class PeerSync {
-  constructor(id, peers, providers, receivers, activeProviders, peerSubscriptions) {
+  constructor(id, peers, providers, receivers, activeProviders, peerSubscriptions, customMapDumps) {
     this.id = id;
     this.peers = peers;
     this.providers = providers;
     this.receivers = receivers;
     this.activeProviders = activeProviders;
     this.peerSubscriptions = peerSubscriptions;
+    this.customMapDumps = customMapDumps;
   }
 
 }
 
 function decodePeerSync(decoded) {
-  return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5]);
+  return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5], decoded[6]);
 }
 
 function encodePeerSync(peerSync) {
-  return [peerSync.id, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions];
+  return [peerSync.id, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions, peerSync.customMapDumps];
 }
 
 export class PeerSyncResponse {
@@ -523,6 +524,23 @@ function encodePublisherPeerMessage(message) {
   return [message.key, message.socketId, message.message];
 }
 
+export class CustomMapDump {
+  constructor(name, queue, ids = []) {
+    this.name = name;
+    this.queue = queue;
+    this.ids = ids;
+  }
+
+}
+
+function decodeCustomMapDump(decoded) {
+  return new CustomMapDump(decoded[0], decoded[1], decoded[2]);
+}
+
+function encodeCustomMapDump(dump) {
+  return [dump.name, dump.queue, dump.ids];
+}
+
 addExtension({
   Class: Credentials,
   type: 0x1,
@@ -708,6 +726,12 @@ addExtension({
   type: 0x42,
   write: encodeDataSyncDeletions,
   read: decodeDataSyncDeletions
+});
+addExtension({
+  Class: CustomMapDump,
+  type: 0x43,
+  write: encodeCustomMapDump,
+  read: decodeCustomMapDump
 });
 export { isNativeAccelerationEnabled };
 export const encode = pack;

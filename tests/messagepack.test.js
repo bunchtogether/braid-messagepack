@@ -35,6 +35,7 @@ const {
   MultipartContainer,
   DataSyncInsertions,
   DataSyncDeletions,
+  CustomMapDump,
   encode,
   decode,
 } = require('../src');
@@ -246,7 +247,8 @@ describe('Messagepack', () => {
     const receiverDump = new ReceiverDump([[], []], []);
     const activeProviderDump = new ActiveProviderDump([[], []], []);
     const peerSubscriptionDump = new PeerSubscriptionDump([[], []], []);
-    const peerSync = new PeerSync(id, peerDump, providerDump, receiverDump, activeProviderDump, peerSubscriptionDump);
+    const customMapDumps = [new CustomMapDump(uuid.v4(), [[], []], [])];
+    const peerSync = new PeerSync(id, peerDump, providerDump, receiverDump, activeProviderDump, peerSubscriptionDump, customMapDumps);
     const encoded = encode(peerSync);
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(PeerSync);
@@ -256,6 +258,8 @@ describe('Messagepack', () => {
     expect(decoded.receivers).toBeInstanceOf(ReceiverDump);
     expect(decoded.activeProviders).toBeInstanceOf(ActiveProviderDump);
     expect(decoded.peerSubscriptions).toBeInstanceOf(PeerSubscriptionDump);
+    expect(decoded.customMapDumps[0]).toBeInstanceOf(CustomMapDump);
+    expect(decoded.customMapDumps[0].name).toEqual(customMapDumps[0].name);
   });
   test('Should encode and decode peer sync responses', async () => {
     const id = randomInteger();
@@ -425,5 +429,25 @@ describe('Messagepack', () => {
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(DataSyncDeletions);
     expect(decoded.deletions).toEqual(deletions);
+  });
+
+  test('Should encode and decode custom map dumps', async () => {
+    const name = uuid.v4();
+    const alice = new ObservedRemoveMap([], { bufferPublishing: 0 });
+    const bob = new ObservedRemoveMap([], { bufferPublishing: 0 });
+    const key = uuid.v4();
+    const value = {
+      [uuid.v4()]: uuid.v4(),
+    };
+    alice.set(key, value);
+    const ids = [randomInteger()];
+    const customMapDump = new CustomMapDump(name, alice.dump(), ids);
+    const encoded = encode(customMapDump);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(CustomMapDump);
+    expect(decoded.name).toEqual(name);
+    bob.process(decoded.queue);
+    expect(bob.get(key)).toEqual(value);
+    expect(ids).toEqual(decoded.ids);
   });
 });
