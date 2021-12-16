@@ -404,6 +404,31 @@ function encodeBraidEvent(event: BraidEvent) {
   return [event.name, event.args, event.id, event.ids];
 }
 
+export class BraidSocketEvent {
+  constructor(name: string, args:Array<any>, peerId:number, socketId:number, id:string, ids?:Array<number> = []) {
+    this.name = name;
+    this.args = args;
+    this.peerId = peerId;
+    this.socketId = socketId;
+    this.id = id;
+    this.ids = ids;
+  }
+  declare name: string;
+  declare args: Array<any>;
+  declare peerId: number;
+  declare socketId: number;
+  declare id: string;
+  declare ids:Array<number>;
+}
+
+function decodeBraidSocketEvent(decoded: [string, Array<any>, number, number, string, Array<number>]) {
+  return new BraidSocketEvent(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5]);
+}
+
+function encodeBraidSocketEvent(event: BraidSocketEvent) {
+  return [event.name, event.args, event.peerId, event.socketId, event.id, event.ids];
+}
+
 export class ReceiverDump {
   constructor(queue:[Array<*>, Array<*>], ids?:Array<number> = []) {
     this.queue = queue;
@@ -756,6 +781,12 @@ addExtension({
   type: 0x43,
   write: encodeCustomMapDump,
   read: decodeCustomMapDump,
+});
+addExtension({
+  Class: BraidSocketEvent,
+  type: 0x44,
+  write: encodeBraidSocketEvent,
+  read: decodeBraidSocketEvent,
 });
 
 export { isNativeAccelerationEnabled };

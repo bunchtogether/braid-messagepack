@@ -392,6 +392,26 @@ function encodeBraidEvent(event) {
   return [event.name, event.args, event.id, event.ids];
 }
 
+export class BraidSocketEvent {
+  constructor(name, args, peerId, socketId, id, ids = []) {
+    this.name = name;
+    this.args = args;
+    this.peerId = peerId;
+    this.socketId = socketId;
+    this.id = id;
+    this.ids = ids;
+  }
+
+}
+
+function decodeBraidSocketEvent(decoded) {
+  return new BraidSocketEvent(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5]);
+}
+
+function encodeBraidSocketEvent(event) {
+  return [event.name, event.args, event.peerId, event.socketId, event.id, event.ids];
+}
+
 export class ReceiverDump {
   constructor(queue, ids = []) {
     this.queue = queue;
@@ -732,6 +752,12 @@ addExtension({
   type: 0x43,
   write: encodeCustomMapDump,
   read: decodeCustomMapDump
+});
+addExtension({
+  Class: BraidSocketEvent,
+  type: 0x44,
+  write: encodeBraidSocketEvent,
+  read: decodeBraidSocketEvent
 });
 export { isNativeAccelerationEnabled };
 export const encode = pack;

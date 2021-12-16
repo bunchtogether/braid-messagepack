@@ -16,6 +16,7 @@ const {
   EventSubscribeResponse,
   EventUnsubscribe,
   BraidEvent,
+  BraidSocketEvent,
   DataDump,
   ProviderDump,
   ActiveProviderDump,
@@ -155,6 +156,24 @@ describe('Messagepack', () => {
     expect(decoded).toBeInstanceOf(BraidEvent);
     expect(decoded.name).toEqual(name);
     expect(decoded.args).toEqual(args);
+    expect(decoded.ids).toEqual(ids);
+    expect(decoded.id).toEqual(id);
+  });
+  test('Should encode and decode socket events', async () => {
+    const name = uuid.v4();
+    const args = [uuid.v4(), uuid.v4()];
+    const peerId = randomInteger();
+    const socketId = randomInteger();
+    const id = uuid.v4();
+    const ids = [randomInteger()];
+    const braidSocketEvent = new BraidSocketEvent(name, args, peerId, socketId, id, ids);
+    const encoded = encode(braidSocketEvent);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(BraidSocketEvent);
+    expect(decoded.name).toEqual(name);
+    expect(decoded.args).toEqual(args);
+    expect(decoded.peerId).toEqual(peerId);
+    expect(decoded.socketId).toEqual(socketId);
     expect(decoded.ids).toEqual(ids);
     expect(decoded.id).toEqual(id);
   });

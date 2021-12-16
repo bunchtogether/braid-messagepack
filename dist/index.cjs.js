@@ -5,7 +5,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.encode = exports.decode = exports.Unsubscribe = exports.Unpublish = exports.Unpeer = exports.SubscribeResponse = exports.SubscribeRequest = exports.ReceiverDump = exports.PublisherPeerMessage = exports.PublisherOpen = exports.PublisherMessage = exports.PublisherClose = exports.PublishResponse = exports.PublishRequest = exports.ProviderDump = exports.PeerSyncResponse = exports.PeerSync = exports.PeerSubscriptionDump = exports.PeerResponse = exports.PeerRequest = exports.PeerPublisherDump = exports.PeerDump = exports.MultipartContainer = exports.MergeChunksPromise = exports.EventUnsubscribe = exports.EventSubscribeResponse = exports.EventSubscribeRequest = exports.DataSyncInsertions = exports.DataSyncDeletions = exports.DataDump = exports.CustomMapDump = exports.CredentialsResponse = exports.Credentials = exports.BraidEvent = exports.ActiveProviderDump = void 0;
+exports.encode = exports.decode = exports.Unsubscribe = exports.Unpublish = exports.Unpeer = exports.SubscribeResponse = exports.SubscribeRequest = exports.ReceiverDump = exports.PublisherPeerMessage = exports.PublisherOpen = exports.PublisherMessage = exports.PublisherClose = exports.PublishResponse = exports.PublishRequest = exports.ProviderDump = exports.PeerSyncResponse = exports.PeerSync = exports.PeerSubscriptionDump = exports.PeerResponse = exports.PeerRequest = exports.PeerPublisherDump = exports.PeerDump = exports.MultipartContainer = exports.MergeChunksPromise = exports.EventUnsubscribe = exports.EventSubscribeResponse = exports.EventSubscribeRequest = exports.DataSyncInsertions = exports.DataSyncDeletions = exports.DataDump = exports.CustomMapDump = exports.CredentialsResponse = exports.Credentials = exports.BraidSocketEvent = exports.BraidEvent = exports.ActiveProviderDump = void 0;
 Object.defineProperty(exports, "isNativeAccelerationEnabled", {
   enumerable: true,
   get: function get() {
@@ -507,6 +507,29 @@ function encodeBraidEvent(event) {
   return [event.name, event.args, event.id, event.ids];
 }
 
+var BraidSocketEvent = function BraidSocketEvent(name, args, peerId, socketId, id) {
+  var ids = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : [];
+
+  _classCallCheck(this, BraidSocketEvent);
+
+  this.name = name;
+  this.args = args;
+  this.peerId = peerId;
+  this.socketId = socketId;
+  this.id = id;
+  this.ids = ids;
+};
+
+exports.BraidSocketEvent = BraidSocketEvent;
+
+function decodeBraidSocketEvent(decoded) {
+  return new BraidSocketEvent(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5]);
+}
+
+function encodeBraidSocketEvent(event) {
+  return [event.name, event.args, event.peerId, event.socketId, event.id, event.ids];
+}
+
 var ReceiverDump = function ReceiverDump(queue) {
   var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
@@ -863,6 +886,12 @@ function encodeCustomMapDump(dump) {
   type: 0x43,
   write: encodeCustomMapDump,
   read: decodeCustomMapDump
+});
+(0, _msgpackr.addExtension)({
+  Class: BraidSocketEvent,
+  type: 0x44,
+  write: encodeBraidSocketEvent,
+  read: decodeBraidSocketEvent
 });
 var encode = _msgpackr.pack;
 exports.encode = encode;
