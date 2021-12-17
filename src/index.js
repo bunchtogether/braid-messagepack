@@ -38,7 +38,7 @@ function decodeCredentialsResponse(value: {success: boolean, code: number, messa
 }
 
 export class PeerSync {
-  constructor(id:number, peers:PeerDump, providers:ProviderDump, receivers:ReceiverDump, activeProviders: ActiveProviderDump, peerSubscriptions: PeerSubscriptionDump, customMapDumps: Array<CustomMapDump>) {
+  constructor(id:number, peers:PeerDump, providers:ProviderDump, receivers:ReceiverDump, activeProviders: ActiveProviderDump, peerSubscriptions: PeerSubscriptionDump, customMapDumps: Array<CustomMapDump>, customSetDumps: Array<CustomSetDump>) {
     this.id = id;
     this.peers = peers;
     this.providers = providers;
@@ -46,6 +46,7 @@ export class PeerSync {
     this.activeProviders = activeProviders;
     this.peerSubscriptions = peerSubscriptions;
     this.customMapDumps = customMapDumps;
+    this.customSetDumps = customSetDumps;
   }
   declare id: number;
   declare peers: PeerDump;
@@ -54,14 +55,15 @@ export class PeerSync {
   declare activeProviders: ActiveProviderDump;
   declare peerSubscriptions: PeerSubscriptionDump;
   declare customMapDumps: Array<CustomMapDump>;
+  declare customSetDumps: Array<CustomSetDump>;
 }
 
-function decodePeerSync(decoded: [number, PeerDump, ProviderDump, ReceiverDump, ActiveProviderDump, PeerSubscriptionDump, Array<CustomMapDump>]) {
-  return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5], decoded[6]);
+function decodePeerSync(decoded: [number, PeerDump, ProviderDump, ReceiverDump, ActiveProviderDump, PeerSubscriptionDump, Array<CustomMapDump>, Array<CustomSetDump>]) {
+  return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5], decoded[6], decoded[7]);
 }
 
 function encodePeerSync(peerSync: PeerSync) {
-  return [peerSync.id, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions, peerSync.customMapDumps];
+  return [peerSync.id, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions, peerSync.customMapDumps, peerSync.customSetDumps];
 }
 
 export class PeerSyncResponse {
@@ -589,6 +591,25 @@ function encodeCustomMapDump(dump: CustomMapDump) {
   return [dump.name, dump.queue, dump.ids];
 }
 
+export class CustomSetDump {
+  constructor(name:string, queue:[Array<*>, Array<*>], ids?:Array<number> = []) {
+    this.name = name;
+    this.queue = queue;
+    this.ids = ids;
+  }
+  declare name: string;
+  declare queue:[Array<*>, Array<*>];
+  declare ids:Array<number>;
+}
+
+function decodeCustomSetDump(decoded:[string, [Array<*>, Array<*>], Array<number>]) {
+  return new CustomSetDump(decoded[0], decoded[1], decoded[2]);
+}
+
+function encodeCustomSetDump(dump: CustomSetDump) {
+  return [dump.name, dump.queue, dump.ids];
+}
+
 addExtension({
   Class: Credentials,
   type: 0x1,
@@ -787,6 +808,12 @@ addExtension({
   type: 0x44,
   write: encodeBraidSocketEvent,
   read: decodeBraidSocketEvent,
+});
+addExtension({
+  Class: CustomSetDump,
+  type: 0x45,
+  write: encodeCustomSetDump,
+  read: decodeCustomSetDump,
 });
 
 export { isNativeAccelerationEnabled };

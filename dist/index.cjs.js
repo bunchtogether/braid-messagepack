@@ -5,7 +5,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.encode = exports.decode = exports.Unsubscribe = exports.Unpublish = exports.Unpeer = exports.SubscribeResponse = exports.SubscribeRequest = exports.ReceiverDump = exports.PublisherPeerMessage = exports.PublisherOpen = exports.PublisherMessage = exports.PublisherClose = exports.PublishResponse = exports.PublishRequest = exports.ProviderDump = exports.PeerSyncResponse = exports.PeerSync = exports.PeerSubscriptionDump = exports.PeerResponse = exports.PeerRequest = exports.PeerPublisherDump = exports.PeerDump = exports.MultipartContainer = exports.MergeChunksPromise = exports.EventUnsubscribe = exports.EventSubscribeResponse = exports.EventSubscribeRequest = exports.DataSyncInsertions = exports.DataSyncDeletions = exports.DataDump = exports.CustomMapDump = exports.CredentialsResponse = exports.Credentials = exports.BraidSocketEvent = exports.BraidEvent = exports.ActiveProviderDump = void 0;
+exports.encode = exports.decode = exports.Unsubscribe = exports.Unpublish = exports.Unpeer = exports.SubscribeResponse = exports.SubscribeRequest = exports.ReceiverDump = exports.PublisherPeerMessage = exports.PublisherOpen = exports.PublisherMessage = exports.PublisherClose = exports.PublishResponse = exports.PublishRequest = exports.ProviderDump = exports.PeerSyncResponse = exports.PeerSync = exports.PeerSubscriptionDump = exports.PeerResponse = exports.PeerRequest = exports.PeerPublisherDump = exports.PeerDump = exports.MultipartContainer = exports.MergeChunksPromise = exports.EventUnsubscribe = exports.EventSubscribeResponse = exports.EventSubscribeRequest = exports.DataSyncInsertions = exports.DataSyncDeletions = exports.DataDump = exports.CustomSetDump = exports.CustomMapDump = exports.CredentialsResponse = exports.Credentials = exports.BraidSocketEvent = exports.BraidEvent = exports.ActiveProviderDump = void 0;
 Object.defineProperty(exports, "isNativeAccelerationEnabled", {
   enumerable: true,
   get: function get() {
@@ -81,7 +81,7 @@ function decodeCredentialsResponse(value) {
   return new CredentialsResponse(value);
 }
 
-var PeerSync = function PeerSync(id, peers, providers, receivers, activeProviders, peerSubscriptions, customMapDumps) {
+var PeerSync = function PeerSync(id, peers, providers, receivers, activeProviders, peerSubscriptions, customMapDumps, customSetDumps) {
   _classCallCheck(this, PeerSync);
 
   this.id = id;
@@ -91,16 +91,17 @@ var PeerSync = function PeerSync(id, peers, providers, receivers, activeProvider
   this.activeProviders = activeProviders;
   this.peerSubscriptions = peerSubscriptions;
   this.customMapDumps = customMapDumps;
+  this.customSetDumps = customSetDumps;
 };
 
 exports.PeerSync = PeerSync;
 
 function decodePeerSync(decoded) {
-  return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5], decoded[6]);
+  return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5], decoded[6], decoded[7]);
 }
 
 function encodePeerSync(peerSync) {
-  return [peerSync.id, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions, peerSync.customMapDumps];
+  return [peerSync.id, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions, peerSync.customMapDumps, peerSync.customSetDumps];
 }
 
 var PeerSyncResponse = function PeerSyncResponse(value) {
@@ -695,6 +696,26 @@ function encodeCustomMapDump(dump) {
   return [dump.name, dump.queue, dump.ids];
 }
 
+var CustomSetDump = function CustomSetDump(name, queue) {
+  var ids = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
+  _classCallCheck(this, CustomSetDump);
+
+  this.name = name;
+  this.queue = queue;
+  this.ids = ids;
+};
+
+exports.CustomSetDump = CustomSetDump;
+
+function decodeCustomSetDump(decoded) {
+  return new CustomSetDump(decoded[0], decoded[1], decoded[2]);
+}
+
+function encodeCustomSetDump(dump) {
+  return [dump.name, dump.queue, dump.ids];
+}
+
 (0, _msgpackr.addExtension)({
   Class: Credentials,
   type: 0x1,
@@ -892,6 +913,12 @@ function encodeCustomMapDump(dump) {
   type: 0x44,
   write: encodeBraidSocketEvent,
   read: decodeBraidSocketEvent
+});
+(0, _msgpackr.addExtension)({
+  Class: CustomSetDump,
+  type: 0x45,
+  write: encodeCustomSetDump,
+  read: decodeCustomSetDump
 });
 var encode = _msgpackr.pack;
 exports.encode = encode;

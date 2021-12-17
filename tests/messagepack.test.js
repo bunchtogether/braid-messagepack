@@ -37,6 +37,7 @@ const {
   DataSyncInsertions,
   DataSyncDeletions,
   CustomMapDump,
+  CustomSetDump,
   encode,
   decode,
 } = require('../src');
@@ -267,7 +268,8 @@ describe('Messagepack', () => {
     const activeProviderDump = new ActiveProviderDump([[], []], []);
     const peerSubscriptionDump = new PeerSubscriptionDump([[], []], []);
     const customMapDumps = [new CustomMapDump(uuid.v4(), [[], []], [])];
-    const peerSync = new PeerSync(id, peerDump, providerDump, receiverDump, activeProviderDump, peerSubscriptionDump, customMapDumps);
+    const customSetDumps = [new CustomSetDump(uuid.v4(), [[], []], [])];
+    const peerSync = new PeerSync(id, peerDump, providerDump, receiverDump, activeProviderDump, peerSubscriptionDump, customMapDumps, customSetDumps);
     const encoded = encode(peerSync);
     const decoded = decode(encoded);
     expect(decoded).toBeInstanceOf(PeerSync);
@@ -279,6 +281,8 @@ describe('Messagepack', () => {
     expect(decoded.peerSubscriptions).toBeInstanceOf(PeerSubscriptionDump);
     expect(decoded.customMapDumps[0]).toBeInstanceOf(CustomMapDump);
     expect(decoded.customMapDumps[0].name).toEqual(customMapDumps[0].name);
+    expect(decoded.customSetDumps[0]).toBeInstanceOf(CustomSetDump);
+    expect(decoded.customSetDumps[0].name).toEqual(customSetDumps[0].name);
   });
   test('Should encode and decode peer sync responses', async () => {
     const id = randomInteger();
@@ -467,6 +471,23 @@ describe('Messagepack', () => {
     expect(decoded.name).toEqual(name);
     bob.process(decoded.queue);
     expect(bob.get(key)).toEqual(value);
+    expect(ids).toEqual(decoded.ids);
+  });
+
+  test('Should encode and decode custom set dumps', async () => {
+    const name = uuid.v4();
+    const alice = new ObservedRemoveSet([], { bufferPublishing: 0 });
+    const bob = new ObservedRemoveSet([], { bufferPublishing: 0 });
+    const value = uuid.v4();
+    alice.add(value);
+    const ids = [randomInteger()];
+    const customSetDump = new CustomSetDump(name, alice.dump(), ids);
+    const encoded = encode(customSetDump);
+    const decoded = decode(encoded);
+    expect(decoded).toBeInstanceOf(CustomSetDump);
+    expect(decoded.name).toEqual(name);
+    bob.process(decoded.queue);
+    expect(bob.has(value)).toEqual(true);
     expect(ids).toEqual(decoded.ids);
   });
 });

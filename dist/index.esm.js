@@ -33,7 +33,7 @@ function decodeCredentialsResponse(value) {
 }
 
 export class PeerSync {
-  constructor(id, peers, providers, receivers, activeProviders, peerSubscriptions, customMapDumps) {
+  constructor(id, peers, providers, receivers, activeProviders, peerSubscriptions, customMapDumps, customSetDumps) {
     this.id = id;
     this.peers = peers;
     this.providers = providers;
@@ -41,16 +41,17 @@ export class PeerSync {
     this.activeProviders = activeProviders;
     this.peerSubscriptions = peerSubscriptions;
     this.customMapDumps = customMapDumps;
+    this.customSetDumps = customSetDumps;
   }
 
 }
 
 function decodePeerSync(decoded) {
-  return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5], decoded[6]);
+  return new PeerSync(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4], decoded[5], decoded[6], decoded[7]);
 }
 
 function encodePeerSync(peerSync) {
-  return [peerSync.id, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions, peerSync.customMapDumps];
+  return [peerSync.id, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions, peerSync.customMapDumps, peerSync.customSetDumps];
 }
 
 export class PeerSyncResponse {
@@ -561,6 +562,23 @@ function encodeCustomMapDump(dump) {
   return [dump.name, dump.queue, dump.ids];
 }
 
+export class CustomSetDump {
+  constructor(name, queue, ids = []) {
+    this.name = name;
+    this.queue = queue;
+    this.ids = ids;
+  }
+
+}
+
+function decodeCustomSetDump(decoded) {
+  return new CustomSetDump(decoded[0], decoded[1], decoded[2]);
+}
+
+function encodeCustomSetDump(dump) {
+  return [dump.name, dump.queue, dump.ids];
+}
+
 addExtension({
   Class: Credentials,
   type: 0x1,
@@ -758,6 +776,12 @@ addExtension({
   type: 0x44,
   write: encodeBraidSocketEvent,
   read: decodeBraidSocketEvent
+});
+addExtension({
+  Class: CustomSetDump,
+  type: 0x45,
+  write: encodeCustomSetDump,
+  read: decodeCustomSetDump
 });
 export { isNativeAccelerationEnabled };
 export const encode = pack;
