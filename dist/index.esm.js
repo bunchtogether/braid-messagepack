@@ -479,9 +479,10 @@ function decodeUnpublish(value) {
 }
 
 export class PublisherOpen {
-  constructor(regexString, key, socketId, credentials) {
+  constructor(regexString, key, serverId, socketId, credentials) {
     this.regexString = regexString;
     this.key = key;
+    this.serverId = serverId;
     this.socketId = socketId;
     this.credentials = credentials;
   }
@@ -489,27 +490,28 @@ export class PublisherOpen {
 }
 
 function decodePublisherOpen(decoded) {
-  return new PublisherOpen(decoded[0], decoded[1], decoded[2], decoded[3]);
+  return new PublisherOpen(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4]);
 }
 
 function encodePublisherOpen(message) {
-  return [message.regexString, message.key, message.socketId, message.credentials];
+  return [message.regexString, message.key, message.serverId, message.socketId, message.credentials];
 }
 
 export class PublisherClose {
-  constructor(key, socketId) {
+  constructor(key, serverId, socketId) {
     this.key = key;
+    this.serverId = serverId;
     this.socketId = socketId;
   }
 
 }
 
 function decodePublisherClose(decoded) {
-  return new PublisherClose(decoded[0], decoded[1]);
+  return new PublisherClose(decoded[0], decoded[1], decoded[2]);
 }
 
 function encodePublisherClose(message) {
-  return [message.key, message.socketId];
+  return [message.key, message.serverId, message.socketId];
 }
 
 export class PublisherMessage {
@@ -529,8 +531,9 @@ function encodePublisherMessage(message) {
 }
 
 export class PublisherPeerMessage {
-  constructor(key, socketId, message) {
+  constructor(key, serverId, socketId, message) {
     this.key = key;
+    this.serverId = serverId;
     this.socketId = socketId;
     this.message = message;
   }
@@ -538,11 +541,11 @@ export class PublisherPeerMessage {
 }
 
 function decodePublisherPeerMessage(decoded) {
-  return new PublisherPeerMessage(decoded[0], decoded[1], decoded[2]);
+  return new PublisherPeerMessage(decoded[0], decoded[1], decoded[2], decoded[3]);
 }
 
 function encodePublisherPeerMessage(message) {
-  return [message.key, message.socketId, message.message];
+  return [message.key, message.serverId, message.socketId, message.message];
 }
 
 export class CustomMapDump {

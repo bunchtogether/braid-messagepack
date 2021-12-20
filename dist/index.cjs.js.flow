@@ -499,41 +499,45 @@ function decodeUnpublish(value:string) {
 }
 
 export class PublisherOpen {
-  constructor(regexString:string, key:string, socketId:number, credentials: any) {
+  constructor(regexString:string, key:string, serverId:number, socketId:number, credentials: any) {
     this.regexString = regexString;
     this.key = key;
+    this.serverId = serverId;
     this.socketId = socketId;
     this.credentials = credentials;
   }
   declare regexString:string;
   declare key:string;
+  declare serverId:number;
   declare socketId:number;
   declare credentials:any;
 }
 
-function decodePublisherOpen(decoded: [string, string, number, any]) {
-  return new PublisherOpen(decoded[0], decoded[1], decoded[2], decoded[3]);
+function decodePublisherOpen(decoded: [string, string, number, number, any]) {
+  return new PublisherOpen(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4]);
 }
 
 function encodePublisherOpen(message: PublisherOpen) {
-  return [message.regexString, message.key, message.socketId, message.credentials];
+  return [message.regexString, message.key, message.serverId, message.socketId, message.credentials];
 }
 
 export class PublisherClose {
-  constructor(key:string, socketId:number) {
+  constructor(key:string, serverId:number, socketId:number) {
     this.key = key;
+    this.serverId = serverId;
     this.socketId = socketId;
   }
   declare key:string;
+  declare serverId:number;
   declare socketId:number;
 }
 
-function decodePublisherClose(decoded: [string, number]) {
-  return new PublisherClose(decoded[0], decoded[1]);
+function decodePublisherClose(decoded: [string, number, number]) {
+  return new PublisherClose(decoded[0], decoded[1], decoded[2]);
 }
 
 function encodePublisherClose(message: PublisherClose) {
-  return [message.key, message.socketId];
+  return [message.key, message.serverId, message.socketId];
 }
 
 export class PublisherMessage {
@@ -554,22 +558,24 @@ function encodePublisherMessage(message: PublisherMessage) {
 }
 
 export class PublisherPeerMessage {
-  constructor(key:string, socketId:number, message: any) {
+  constructor(key:string, serverId:number, socketId:number, message: any) {
     this.key = key;
+    this.serverId = serverId;
     this.socketId = socketId;
     this.message = message;
   }
   declare key:string;
+  declare serverId:number;
   declare socketId:number;
   declare message:any;
 }
 
-function decodePublisherPeerMessage(decoded: [string, number, any]) {
-  return new PublisherPeerMessage(decoded[0], decoded[1], decoded[2]);
+function decodePublisherPeerMessage(decoded: [string, number, number, any]) {
+  return new PublisherPeerMessage(decoded[0], decoded[1], decoded[2], decoded[3]);
 }
 
 function encodePublisherPeerMessage(message: PublisherPeerMessage) {
-  return [message.key, message.socketId, message.message];
+  return [message.key, message.serverId, message.socketId, message.message];
 }
 
 export class CustomMapDump {

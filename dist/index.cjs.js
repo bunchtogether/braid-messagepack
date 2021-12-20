@@ -605,11 +605,12 @@ function decodeUnpublish(value) {
   return new Unpublish(value);
 }
 
-var PublisherOpen = function PublisherOpen(regexString, key, socketId, credentials) {
+var PublisherOpen = function PublisherOpen(regexString, key, serverId, socketId, credentials) {
   _classCallCheck(this, PublisherOpen);
 
   this.regexString = regexString;
   this.key = key;
+  this.serverId = serverId;
   this.socketId = socketId;
   this.credentials = credentials;
 };
@@ -617,28 +618,29 @@ var PublisherOpen = function PublisherOpen(regexString, key, socketId, credentia
 exports.PublisherOpen = PublisherOpen;
 
 function decodePublisherOpen(decoded) {
-  return new PublisherOpen(decoded[0], decoded[1], decoded[2], decoded[3]);
+  return new PublisherOpen(decoded[0], decoded[1], decoded[2], decoded[3], decoded[4]);
 }
 
 function encodePublisherOpen(message) {
-  return [message.regexString, message.key, message.socketId, message.credentials];
+  return [message.regexString, message.key, message.serverId, message.socketId, message.credentials];
 }
 
-var PublisherClose = function PublisherClose(key, socketId) {
+var PublisherClose = function PublisherClose(key, serverId, socketId) {
   _classCallCheck(this, PublisherClose);
 
   this.key = key;
+  this.serverId = serverId;
   this.socketId = socketId;
 };
 
 exports.PublisherClose = PublisherClose;
 
 function decodePublisherClose(decoded) {
-  return new PublisherClose(decoded[0], decoded[1]);
+  return new PublisherClose(decoded[0], decoded[1], decoded[2]);
 }
 
 function encodePublisherClose(message) {
-  return [message.key, message.socketId];
+  return [message.key, message.serverId, message.socketId];
 }
 
 var PublisherMessage = function PublisherMessage(key, message) {
@@ -658,10 +660,11 @@ function encodePublisherMessage(message) {
   return [message.key, message.message];
 }
 
-var PublisherPeerMessage = function PublisherPeerMessage(key, socketId, message) {
+var PublisherPeerMessage = function PublisherPeerMessage(key, serverId, socketId, message) {
   _classCallCheck(this, PublisherPeerMessage);
 
   this.key = key;
+  this.serverId = serverId;
   this.socketId = socketId;
   this.message = message;
 };
@@ -669,11 +672,11 @@ var PublisherPeerMessage = function PublisherPeerMessage(key, socketId, message)
 exports.PublisherPeerMessage = PublisherPeerMessage;
 
 function decodePublisherPeerMessage(decoded) {
-  return new PublisherPeerMessage(decoded[0], decoded[1], decoded[2]);
+  return new PublisherPeerMessage(decoded[0], decoded[1], decoded[2], decoded[3]);
 }
 
 function encodePublisherPeerMessage(message) {
-  return [message.key, message.socketId, message.message];
+  return [message.key, message.serverId, message.socketId, message.message];
 }
 
 var CustomMapDump = function CustomMapDump(name, queue) {
