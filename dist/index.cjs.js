@@ -1,6 +1,6 @@
 "use strict";
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -23,11 +23,7 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
@@ -47,6 +43,10 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function defaultEncode(o) {
@@ -57,11 +57,11 @@ function encodeEmpty() {
   return [];
 }
 
-var Credentials = function Credentials(value) {
+var Credentials = /*#__PURE__*/_createClass(function Credentials(value) {
   _classCallCheck(this, Credentials);
 
   this.value = value;
-};
+});
 
 exports.Credentials = Credentials;
 
@@ -69,11 +69,11 @@ function decodeCredentials(value) {
   return new Credentials(value);
 }
 
-var CredentialsResponse = function CredentialsResponse(value) {
+var CredentialsResponse = /*#__PURE__*/_createClass(function CredentialsResponse(value) {
   _classCallCheck(this, CredentialsResponse);
 
   this.value = value;
-};
+});
 
 exports.CredentialsResponse = CredentialsResponse;
 
@@ -81,7 +81,7 @@ function decodeCredentialsResponse(value) {
   return new CredentialsResponse(value);
 }
 
-var PeerSync = function PeerSync(id, peers, providers, receivers, activeProviders, peerSubscriptions, customMapDumps, customSetDumps) {
+var PeerSync = /*#__PURE__*/_createClass(function PeerSync(id, peers, providers, receivers, activeProviders, peerSubscriptions, customMapDumps, customSetDumps) {
   _classCallCheck(this, PeerSync);
 
   this.id = id;
@@ -92,7 +92,7 @@ var PeerSync = function PeerSync(id, peers, providers, receivers, activeProvider
   this.peerSubscriptions = peerSubscriptions;
   this.customMapDumps = customMapDumps;
   this.customSetDumps = customSetDumps;
-};
+});
 
 exports.PeerSync = PeerSync;
 
@@ -104,11 +104,11 @@ function encodePeerSync(peerSync) {
   return [peerSync.id, peerSync.peers, peerSync.providers, peerSync.receivers, peerSync.activeProviders, peerSync.peerSubscriptions, peerSync.customMapDumps, peerSync.customSetDumps];
 }
 
-var PeerSyncResponse = function PeerSyncResponse(value) {
+var PeerSyncResponse = /*#__PURE__*/_createClass(function PeerSyncResponse(value) {
   _classCallCheck(this, PeerSyncResponse);
 
   this.value = value;
-};
+});
 
 exports.PeerSyncResponse = PeerSyncResponse;
 
@@ -202,14 +202,14 @@ var MergeChunksPromise = /*#__PURE__*/function (_Promise, _Symbol$species, _Symb
 
 exports.MergeChunksPromise = MergeChunksPromise;
 
-var MultipartContainer = function MultipartContainer(id, position, length, buffer) {
+var MultipartContainer = /*#__PURE__*/_createClass(function MultipartContainer(id, position, length, buffer) {
   _classCallCheck(this, MultipartContainer);
 
   this.id = id;
   this.position = position;
   this.length = length;
   this.buffer = buffer;
-};
+});
 
 exports.MultipartContainer = MultipartContainer;
 
@@ -254,14 +254,14 @@ function encodeMultipartContainer(multipartContainer) {
   return buffer;
 }
 
-var DataDump = function DataDump(queue) {
+var DataDump = /*#__PURE__*/_createClass(function DataDump(queue) {
   var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
   _classCallCheck(this, DataDump);
 
   this.queue = queue;
   this.ids = ids;
-};
+});
 
 exports.DataDump = DataDump;
 
@@ -273,11 +273,11 @@ function encodeDataDump(dump) {
   return [dump.queue, dump.ids];
 }
 
-var DataSyncInsertions = function DataSyncInsertions(insertions) {
+var DataSyncInsertions = /*#__PURE__*/_createClass(function DataSyncInsertions(insertions) {
   _classCallCheck(this, DataSyncInsertions);
 
   this.insertions = insertions;
-};
+});
 
 exports.DataSyncInsertions = DataSyncInsertions;
 
@@ -289,11 +289,11 @@ function encodeDataSyncInsertions(dataSync) {
   return dataSync.insertions;
 }
 
-var DataSyncDeletions = function DataSyncDeletions(deletions) {
+var DataSyncDeletions = /*#__PURE__*/_createClass(function DataSyncDeletions(deletions) {
   _classCallCheck(this, DataSyncDeletions);
 
   this.deletions = deletions;
-};
+});
 
 exports.DataSyncDeletions = DataSyncDeletions;
 
@@ -305,14 +305,14 @@ function encodeDataSyncDeletions(dataSync) {
   return dataSync.deletions;
 }
 
-var PeerDump = function PeerDump(queue) {
+var PeerDump = /*#__PURE__*/_createClass(function PeerDump(queue) {
   var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
   _classCallCheck(this, PeerDump);
 
   this.queue = queue;
   this.ids = ids;
-};
+});
 
 exports.PeerDump = PeerDump;
 
@@ -324,14 +324,14 @@ function encodePeerDump(dump) {
   return [dump.queue, dump.ids];
 }
 
-var ProviderDump = function ProviderDump(queue) {
+var ProviderDump = /*#__PURE__*/_createClass(function ProviderDump(queue) {
   var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
   _classCallCheck(this, ProviderDump);
 
   this.queue = queue;
   this.ids = ids;
-};
+});
 
 exports.ProviderDump = ProviderDump;
 
@@ -343,14 +343,14 @@ function encodeProviderDump(dump) {
   return [dump.queue, dump.ids];
 }
 
-var ActiveProviderDump = function ActiveProviderDump(queue) {
+var ActiveProviderDump = /*#__PURE__*/_createClass(function ActiveProviderDump(queue) {
   var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
   _classCallCheck(this, ActiveProviderDump);
 
   this.queue = queue;
   this.ids = ids;
-};
+});
 
 exports.ActiveProviderDump = ActiveProviderDump;
 
@@ -362,14 +362,14 @@ function encodeActiveProviderDump(dump) {
   return [dump.queue, dump.ids];
 }
 
-var PeerSubscriptionDump = function PeerSubscriptionDump(queue) {
+var PeerSubscriptionDump = /*#__PURE__*/_createClass(function PeerSubscriptionDump(queue) {
   var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
   _classCallCheck(this, PeerSubscriptionDump);
 
   this.queue = queue;
   this.ids = ids;
-};
+});
 
 exports.PeerSubscriptionDump = PeerSubscriptionDump;
 
@@ -381,11 +381,11 @@ function encodePeerSubscriptionDump(dump) {
   return [dump.queue, dump.ids];
 }
 
-var PeerRequest = function PeerRequest(value) {
+var PeerRequest = /*#__PURE__*/_createClass(function PeerRequest(value) {
   _classCallCheck(this, PeerRequest);
 
   this.value = value;
-};
+});
 
 exports.PeerRequest = PeerRequest;
 
@@ -393,11 +393,11 @@ function decodePeerRequest(value) {
   return new PeerRequest(value);
 }
 
-var PeerResponse = function PeerResponse(value) {
+var PeerResponse = /*#__PURE__*/_createClass(function PeerResponse(value) {
   _classCallCheck(this, PeerResponse);
 
   this.value = value;
-};
+});
 
 exports.PeerResponse = PeerResponse;
 
@@ -405,9 +405,9 @@ function decodePeerResponse(value) {
   return new PeerResponse(value);
 }
 
-var Unpeer = function Unpeer() {
+var Unpeer = /*#__PURE__*/_createClass(function Unpeer() {
   _classCallCheck(this, Unpeer);
-};
+});
 
 exports.Unpeer = Unpeer;
 
@@ -415,11 +415,11 @@ function decodeUnpeer() {
   return new Unpeer();
 }
 
-var SubscribeRequest = function SubscribeRequest(value) {
+var SubscribeRequest = /*#__PURE__*/_createClass(function SubscribeRequest(value) {
   _classCallCheck(this, SubscribeRequest);
 
   this.value = value;
-};
+});
 
 exports.SubscribeRequest = SubscribeRequest;
 
@@ -427,11 +427,11 @@ function decodeSubscribeRequest(value) {
   return new SubscribeRequest(value);
 }
 
-var SubscribeResponse = function SubscribeResponse(value) {
+var SubscribeResponse = /*#__PURE__*/_createClass(function SubscribeResponse(value) {
   _classCallCheck(this, SubscribeResponse);
 
   this.value = value;
-};
+});
 
 exports.SubscribeResponse = SubscribeResponse;
 
@@ -439,11 +439,11 @@ function decodeSubscribeResponse(value) {
   return new SubscribeResponse(value);
 }
 
-var Unsubscribe = function Unsubscribe(value) {
+var Unsubscribe = /*#__PURE__*/_createClass(function Unsubscribe(value) {
   _classCallCheck(this, Unsubscribe);
 
   this.value = value;
-};
+});
 
 exports.Unsubscribe = Unsubscribe;
 
@@ -451,11 +451,11 @@ function decodeUnsubscribe(value) {
   return new Unsubscribe(value);
 }
 
-var EventSubscribeRequest = function EventSubscribeRequest(value) {
+var EventSubscribeRequest = /*#__PURE__*/_createClass(function EventSubscribeRequest(value) {
   _classCallCheck(this, EventSubscribeRequest);
 
   this.value = value;
-};
+});
 
 exports.EventSubscribeRequest = EventSubscribeRequest;
 
@@ -463,11 +463,11 @@ function decodeEventSubscribeRequest(value) {
   return new EventSubscribeRequest(value);
 }
 
-var EventSubscribeResponse = function EventSubscribeResponse(value) {
+var EventSubscribeResponse = /*#__PURE__*/_createClass(function EventSubscribeResponse(value) {
   _classCallCheck(this, EventSubscribeResponse);
 
   this.value = value;
-};
+});
 
 exports.EventSubscribeResponse = EventSubscribeResponse;
 
@@ -475,11 +475,11 @@ function decodeEventSubscribeResponse(value) {
   return new EventSubscribeResponse(value);
 }
 
-var EventUnsubscribe = function EventUnsubscribe(value) {
+var EventUnsubscribe = /*#__PURE__*/_createClass(function EventUnsubscribe(value) {
   _classCallCheck(this, EventUnsubscribe);
 
   this.value = value;
-};
+});
 
 exports.EventUnsubscribe = EventUnsubscribe;
 
@@ -487,7 +487,7 @@ function decodeEventUnsubscribe(value) {
   return new EventUnsubscribe(value);
 }
 
-var BraidEvent = function BraidEvent(name, args, id) {
+var BraidEvent = /*#__PURE__*/_createClass(function BraidEvent(name, args, id) {
   var ids = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [];
 
   _classCallCheck(this, BraidEvent);
@@ -496,7 +496,7 @@ var BraidEvent = function BraidEvent(name, args, id) {
   this.args = args;
   this.id = id;
   this.ids = ids;
-};
+});
 
 exports.BraidEvent = BraidEvent;
 
@@ -508,7 +508,7 @@ function encodeBraidEvent(event) {
   return [event.name, event.args, event.id, event.ids];
 }
 
-var BraidSocketEvent = function BraidSocketEvent(name, args, peerId, socketId, id) {
+var BraidSocketEvent = /*#__PURE__*/_createClass(function BraidSocketEvent(name, args, peerId, socketId, id) {
   var ids = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : [];
 
   _classCallCheck(this, BraidSocketEvent);
@@ -519,7 +519,7 @@ var BraidSocketEvent = function BraidSocketEvent(name, args, peerId, socketId, i
   this.socketId = socketId;
   this.id = id;
   this.ids = ids;
-};
+});
 
 exports.BraidSocketEvent = BraidSocketEvent;
 
@@ -531,14 +531,14 @@ function encodeBraidSocketEvent(event) {
   return [event.name, event.args, event.peerId, event.socketId, event.id, event.ids];
 }
 
-var ReceiverDump = function ReceiverDump(queue) {
+var ReceiverDump = /*#__PURE__*/_createClass(function ReceiverDump(queue) {
   var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
   _classCallCheck(this, ReceiverDump);
 
   this.queue = queue;
   this.ids = ids;
-};
+});
 
 exports.ReceiverDump = ReceiverDump;
 
@@ -550,14 +550,14 @@ function encodeReceiverDump(dump) {
   return [dump.queue, dump.ids];
 }
 
-var PeerPublisherDump = function PeerPublisherDump(queue) {
+var PeerPublisherDump = /*#__PURE__*/_createClass(function PeerPublisherDump(queue) {
   var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
   _classCallCheck(this, PeerPublisherDump);
 
   this.queue = queue;
   this.ids = ids;
-};
+});
 
 exports.PeerPublisherDump = PeerPublisherDump;
 
@@ -569,11 +569,11 @@ function encodePeerPublisherDump(dump) {
   return [dump.queue, dump.ids];
 }
 
-var PublishRequest = function PublishRequest(value) {
+var PublishRequest = /*#__PURE__*/_createClass(function PublishRequest(value) {
   _classCallCheck(this, PublishRequest);
 
   this.value = value;
-};
+});
 
 exports.PublishRequest = PublishRequest;
 
@@ -581,11 +581,11 @@ function decodePublishRequest(value) {
   return new PublishRequest(value);
 }
 
-var PublishResponse = function PublishResponse(value) {
+var PublishResponse = /*#__PURE__*/_createClass(function PublishResponse(value) {
   _classCallCheck(this, PublishResponse);
 
   this.value = value;
-};
+});
 
 exports.PublishResponse = PublishResponse;
 
@@ -593,11 +593,11 @@ function decodePublishResponse(value) {
   return new PublishResponse(value);
 }
 
-var Unpublish = function Unpublish(value) {
+var Unpublish = /*#__PURE__*/_createClass(function Unpublish(value) {
   _classCallCheck(this, Unpublish);
 
   this.value = value;
-};
+});
 
 exports.Unpublish = Unpublish;
 
@@ -605,7 +605,7 @@ function decodeUnpublish(value) {
   return new Unpublish(value);
 }
 
-var PublisherOpen = function PublisherOpen(regexString, key, serverId, socketId, credentials) {
+var PublisherOpen = /*#__PURE__*/_createClass(function PublisherOpen(regexString, key, serverId, socketId, credentials) {
   _classCallCheck(this, PublisherOpen);
 
   this.regexString = regexString;
@@ -613,7 +613,7 @@ var PublisherOpen = function PublisherOpen(regexString, key, serverId, socketId,
   this.serverId = serverId;
   this.socketId = socketId;
   this.credentials = credentials;
-};
+});
 
 exports.PublisherOpen = PublisherOpen;
 
@@ -625,13 +625,13 @@ function encodePublisherOpen(message) {
   return [message.regexString, message.key, message.serverId, message.socketId, message.credentials];
 }
 
-var PublisherClose = function PublisherClose(key, serverId, socketId) {
+var PublisherClose = /*#__PURE__*/_createClass(function PublisherClose(key, serverId, socketId) {
   _classCallCheck(this, PublisherClose);
 
   this.key = key;
   this.serverId = serverId;
   this.socketId = socketId;
-};
+});
 
 exports.PublisherClose = PublisherClose;
 
@@ -643,12 +643,12 @@ function encodePublisherClose(message) {
   return [message.key, message.serverId, message.socketId];
 }
 
-var PublisherMessage = function PublisherMessage(key, message) {
+var PublisherMessage = /*#__PURE__*/_createClass(function PublisherMessage(key, message) {
   _classCallCheck(this, PublisherMessage);
 
   this.key = key;
   this.message = message;
-};
+});
 
 exports.PublisherMessage = PublisherMessage;
 
@@ -660,14 +660,14 @@ function encodePublisherMessage(message) {
   return [message.key, message.message];
 }
 
-var PublisherPeerMessage = function PublisherPeerMessage(key, serverId, socketId, message) {
+var PublisherPeerMessage = /*#__PURE__*/_createClass(function PublisherPeerMessage(key, serverId, socketId, message) {
   _classCallCheck(this, PublisherPeerMessage);
 
   this.key = key;
   this.serverId = serverId;
   this.socketId = socketId;
   this.message = message;
-};
+});
 
 exports.PublisherPeerMessage = PublisherPeerMessage;
 
@@ -679,7 +679,7 @@ function encodePublisherPeerMessage(message) {
   return [message.key, message.serverId, message.socketId, message.message];
 }
 
-var CustomMapDump = function CustomMapDump(name, queue) {
+var CustomMapDump = /*#__PURE__*/_createClass(function CustomMapDump(name, queue) {
   var ids = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 
   _classCallCheck(this, CustomMapDump);
@@ -687,7 +687,7 @@ var CustomMapDump = function CustomMapDump(name, queue) {
   this.name = name;
   this.queue = queue;
   this.ids = ids;
-};
+});
 
 exports.CustomMapDump = CustomMapDump;
 
@@ -699,7 +699,7 @@ function encodeCustomMapDump(dump) {
   return [dump.name, dump.queue, dump.ids];
 }
 
-var CustomSetDump = function CustomSetDump(name, queue) {
+var CustomSetDump = /*#__PURE__*/_createClass(function CustomSetDump(name, queue) {
   var ids = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 
   _classCallCheck(this, CustomSetDump);
@@ -707,7 +707,7 @@ var CustomSetDump = function CustomSetDump(name, queue) {
   this.name = name;
   this.queue = queue;
   this.ids = ids;
-};
+});
 
 exports.CustomSetDump = CustomSetDump;
 
