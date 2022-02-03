@@ -1,6 +1,6 @@
 {
   "name": "@bunchtogether/braid-messagepack",
-  "version": "1.2.11",
+  "version": "1.2.13",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "exports": {
@@ -32,9 +32,9 @@
     ]
   },
   "devDependencies": {
-    "@babel/cli": "^7.16.8",
-    "@babel/core": "^7.16.12",
-    "@babel/eslint-parser": "^7.16.5",
+    "@babel/cli": "^7.17.0",
+    "@babel/core": "^7.17.0",
+    "@babel/eslint-parser": "^7.17.0",
     "@babel/plugin-transform-flow-strip-types": "^7.16.7",
     "@babel/preset-env": "^7.16.11",
     "codecov": "^3.8.2",
@@ -49,12 +49,12 @@
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.28.0",
     "expect": "^27.4.6",
-    "flow-bin": "^0.170.0",
+    "flow-bin": "^0.171.0",
     "flow-typed": "^3.6.1",
     "husky": "^7.0.4",
     "jest": "^27.4.7",
     "jest-diff": "^27.4.6",
-    "observed-remove": "2.3.0",
+    "observed-remove": "2.3.1",
     "pre-commit": "^1.2.2",
     "uuid": "^8.3.2"
   },
